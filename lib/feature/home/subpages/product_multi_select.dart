@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tk_photo/core/model/product_list_model.dart';
 
-import '../photo/photo_list_view.dart';
+import '../../photo/photo_list_view.dart';
 
 // ignore: must_be_immutable
 class ProductMultiSelect extends ConsumerStatefulWidget {

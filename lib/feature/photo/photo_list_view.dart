@@ -1,13 +1,14 @@
+import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:tk_photo/core/model/product_list_model.dart';
-import 'package:tk_photo/feature/home/photo/photo_provider.dart';
+import 'package:tk_photo/feature/photo/photo_provider.dart';
 import 'package:tk_photo/product/widgets/button/app_elevated_button.dart';
 import 'package:widgets_to_image/widgets_to_image.dart';
 
-import '../../../product/constant/app_color.dart';
+import '../../product/constant/app_color.dart';
 
 // ignore: must_be_immutable
 class PhotoListView extends ConsumerStatefulWidget {
@@ -23,9 +24,12 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
   List<ProductListModel>? photoList;
   List<WidgetsToImageController> controllers = [];
 
+  bool? isCreating = false;
+
   @override
   void initState() {
     super.initState();
+    isCreating = false;
     photoList = widget.photoList;
     _scrollController = ScrollController();
 
@@ -205,6 +209,14 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
         child: AppElevatedButton(
           title: 'Resim Oluştur',
           callback: () async {
+            setState(() {
+              isCreating = true;
+              //scrool to start
+              _scrollController?.animateTo(
+                  _scrollController?.position.minScrollExtent ?? 0,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.ease);
+            });
             try {
               List<Uint8List> images = [];
               List<XFile> files = [];
@@ -227,6 +239,9 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text('Oluşturulurken hata oluştu ${e.toString()}')));
             }
+            setState(() {
+              isCreating = false;
+            });
           },
         ),
       ),
@@ -285,31 +300,49 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
           .where((element) =>
               element !=
               photoList![index].colors![photoList![index].currentIndex!])
-          .map((e) => InkWell(
-                onTap: () {
-                  setState(() {
-                    photoList![index].currentIndex =
-                        photoList![index].colors!.indexOf(e);
-                  });
-                },
-                child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image: NetworkImage(e.colorImage ?? '')),
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Text(
-                          state.showStock == true ? '${e.stock}' : '',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: ColorConstants.mtPrimary),
-                        ))),
-              ))
+          .map((e) => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: badges.Badge(
+                badgeStyle: badges.BadgeStyle(
+                    badgeColor:
+                        isCreating == false ? Colors.grey : Colors.transparent),
+                badgeContent: InkWell(
+                  onTap: () {
+                    setState(() {
+                      photoList![index]
+                          .colors!
+                          .removeAt(photoList![index].colors!.indexOf(e));
+                    });
+                  },
+                  child: Text(
+                    isCreating == false ? 'X' : '',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      photoList![index].currentIndex =
+                          photoList![index].colors!.indexOf(e);
+                    });
+                  },
+                  child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: NetworkImage(e.colorImage ?? '')),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Text(
+                        state.showStock == true ? '${e.stock}' : '',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: ColorConstants.mtPrimary),
+                      )),
+                ),
+              )))
           .toList(),
     );
   }

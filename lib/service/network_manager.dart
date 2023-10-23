@@ -1,3 +1,4 @@
+import 'package:tk_photo/core/model/parameters_model.dart';
 import 'package:tk_photo/service/shared_preferences.dart';
 
 import '../core/model/login_model.dart';
@@ -7,6 +8,7 @@ import '../core/model/product_list_model.dart';
 
 enum GetApiMethod {
   login,
+  parameters,
   productQuery;
 
   String get value {
@@ -15,6 +17,8 @@ enum GetApiMethod {
         return 'login';
       case GetApiMethod.productQuery:
         return 'getProduct';
+      case GetApiMethod.parameters:
+        return 'getParams';
     }
   }
 
@@ -50,6 +54,37 @@ class NetworkManager {
       return loginModel;
     } catch (e) {
       print(e);
+      rethrow;
+    }
+  }
+
+  Future<ParameterModel?> getParams() async {
+    try {
+      var username = await MySharedPreferences.instance
+          .getStringValue(mySharedKey.TKP_USER_NAME);
+
+      var serviceUrl = await MySharedPreferences.instance
+          .getStringValue(mySharedKey.TKP_SERVICE_URL);
+
+      _dio.options.queryParameters.addAll(
+          {'username': username, 'method': GetApiMethod.parameters.method});
+      if (serviceUrl != null && serviceUrl.isNotEmpty) {
+        final response = await _dio.get(
+          serviceUrl,
+          options: Options(headers: {'Accept': 'application/json'}),
+        );
+        print(response.realUri);
+        if (response.statusCode == 200) {
+          return ParameterModel.fromJson(response.data);
+        } else {
+          throw Exception("Bir hata oluştu");
+        }
+      } else {
+        throw Exception("Servis adresi bulunamadı");
+      }
+    } catch (e) {
+      print("Hata: $e");
+
       rethrow;
     }
   }

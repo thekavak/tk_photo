@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/model/general_list_model.dart';
 import '../core/model/login_model.dart';
+import '../core/model/parameters_model.dart';
 
 enum mySharedKey {
   // ignore: constant_identifier_names

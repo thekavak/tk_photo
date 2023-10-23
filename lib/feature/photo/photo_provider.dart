@@ -2,8 +2,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/model_old/product_detail_model.dart';
-import '../../../product/constant/app_process_enum.dart';
+import '../../core/model_old/product_detail_model.dart';
+import '../../product/constant/app_process_enum.dart';
 
 enum AppPropertiesEnum {
   addVariants,

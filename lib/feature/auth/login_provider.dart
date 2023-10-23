@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tk_photo/core/model/parameters_model.dart';
 
 import '../../core/model/app_api_status_model.dart';
 import '../../service/network_manager.dart';
@@ -39,6 +40,15 @@ class LoginFormProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<ParameterModel?> getParameters() {
+    try {
+      var response = _networkManager.getParams();
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<AppApiStatusModel?> submitLoginForm() async {
     if (!isValidUsername()) {
       return AppApiStatusModel(
@@ -58,18 +68,26 @@ class LoginFormProvider extends ChangeNotifier {
           // user login data
           await MySharedPreferences.instance
               .setLoggedInUserData(response.data?.first);
-          // price lists
-          await MySharedPreferences.instance.setGlobalFilterModel(
-              response.prices, mySharedKey.TKP_GLOBAL_FILTER_PRICE_LIST);
-          // warehouses
-          await MySharedPreferences.instance.setGlobalFilterModel(
-              response.warehouseList, mySharedKey.TKP_GLOBAL_FILTER_WAREHOUSE);
-          // categories
-          await MySharedPreferences.instance.setGlobalFilterModel(
-              response.categories, mySharedKey.TKP_GLOBAL_FILTER_CATEGORY);
-          // attributes
-          await MySharedPreferences.instance.setAttributes(
-              response.attributes, mySharedKey.TKP_GLOBAL_FILTER_ATTRIBUTES);
+
+          var parameters = await getParameters();
+          print(parameters);
+          if (parameters != null) {
+            // price lists
+            print(parameters.prices.toString());
+            await MySharedPreferences.instance.setGlobalFilterModel(
+                parameters.prices, mySharedKey.TKP_GLOBAL_FILTER_PRICE_LIST);
+            // warehouses
+            await MySharedPreferences.instance.setGlobalFilterModel(
+                parameters.warehouseList,
+                mySharedKey.TKP_GLOBAL_FILTER_WAREHOUSE);
+            // categories
+            await MySharedPreferences.instance.setGlobalFilterModel(
+                parameters.categories, mySharedKey.TKP_GLOBAL_FILTER_CATEGORY);
+            // attributes
+            await MySharedPreferences.instance.setAttributes(
+                parameters.attributes,
+                mySharedKey.TKP_GLOBAL_FILTER_ATTRIBUTES);
+          }
 
           // return success
           return AppApiStatusModel(message: response.message, result: true);

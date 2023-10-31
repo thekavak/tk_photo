@@ -46,12 +46,13 @@ class LoginView extends ConsumerWidget {
                   isShowIcon: true,
                   callback: () async {
                     var response = await loginForm.submitLoginForm();
-
+                    print("resposne${response?.result}");
                     if (response?.result == true) {
                       // ignore: use_build_context_synchronously
                       await Navigator.pushNamedAndRemoveUntil(
                           context, '/home', (route) => false);
                     } else {
+                      print("else");
                       // ignore: use_build_context_synchronously
                       ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(response?.message ?? '')));

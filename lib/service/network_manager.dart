@@ -5,10 +5,12 @@ import '../core/model/login_model.dart';
 import 'package:dio/dio.dart';
 
 import '../core/model/product_list_model.dart';
+import '../core/model/upload_file_model.dart';
 
 enum GetApiMethod {
   login,
   parameters,
+  uploadImage,
   productQuery;
 
   String get value {
@@ -19,6 +21,8 @@ enum GetApiMethod {
         return 'getProduct';
       case GetApiMethod.parameters:
         return 'getParams';
+      case GetApiMethod.uploadImage:
+        return 'uploadImage';
     }
   }
 
@@ -35,6 +39,33 @@ class NetworkManager {
   final String _baseUrl = 'http://photo.tkyazilim.com/';
 
   final Dio _dio = Dio();
+
+  Future<FileResponse?> uploadProductImage({required FormData formData}) async {
+    try {
+      var serviceUrl = await MySharedPreferences.instance
+          .getStringValue(mySharedKey.TKP_SERVICE_URL);
+      if (serviceUrl != null && serviceUrl.isNotEmpty) {
+        Response uploadResponse = await _dio.post(serviceUrl,
+            queryParameters: {
+              'method': GetApiMethod.uploadImage.method,
+            },
+            data: formData);
+
+        if (uploadResponse.statusCode == 200) {
+          print("uploadResponse.data");
+          return FileResponse.fromJson(uploadResponse.data);
+        } else {
+          print("uploadResponasase");
+          return null;
+        }
+      } else {
+        throw Exception("Servis adresi bulunamadı");
+      }
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
 
   Future<LoginModel?> loginUser(
       {required String username, required String password}) async {

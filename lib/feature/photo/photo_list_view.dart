@@ -1,9 +1,11 @@
-import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kartal/kartal.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:tk_photo/core/model/product_list_model.dart';
+import 'package:tk_photo/feature/photo/photo_edit.dart';
 import 'package:tk_photo/feature/photo/photo_provider.dart';
 import 'package:tk_photo/product/widgets/button/app_elevated_button.dart';
 import 'package:widgets_to_image/widgets_to_image.dart';
@@ -29,6 +31,7 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
   @override
   void initState() {
     super.initState();
+    ref.read(productPhotoProvider.notifier).init();
     isCreating = false;
     photoList = widget.photoList;
     _scrollController = ScrollController();
@@ -36,18 +39,12 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
     for (var i = 0; i < (widget.photoList?.length ?? 0); i++) {
       controllers.add(WidgetsToImageController());
     }
-
-    Future.delayed(const Duration(milliseconds: 500), () {
-      _scrollController?.animateTo(
-          _scrollController?.position.maxScrollExtent ?? 0,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.ease);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     var state = ref.watch(productPhotoProvider);
+
     return Scaffold(
         appBar: AppBar(
           title:
@@ -55,6 +52,8 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
         ),
         body: SingleChildScrollView(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               buildLoading(state),
               saveButton(context, state),
@@ -200,6 +199,36 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
     );
   }
 
+  void saveImages(BuildContext context, PhotoPageState state) async {
+    try {
+      EasyLoading.show(status: 'Resimler Oluşturuluyor');
+      List<Uint8List> images = [];
+      List<XFile> files = [];
+
+      await Future.forEach<WidgetsToImageController>(controllers, (e) async {
+        //scroll one by one
+
+        await e.capture().then((value) async {
+          if (value == null) {
+            return;
+          }
+          files.add(XFile.fromData(
+            Uint8List.fromList(value),
+            name: state.itemCodeDesc.toString(),
+            mimeType: 'image/png',
+          ));
+        });
+      });
+
+      Share.shareXFiles(files);
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Oluşturulurken hata oluştu ${e.toString()}')));
+    }
+    EasyLoading.dismiss();
+  }
+
   Padding saveButton(BuildContext context, PhotoPageState state) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -211,34 +240,12 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
           callback: () async {
             setState(() {
               isCreating = true;
-              //scrool to start
-              _scrollController?.animateTo(
-                  _scrollController?.position.minScrollExtent ?? 0,
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.ease);
             });
-            try {
-              List<Uint8List> images = [];
-              List<XFile> files = [];
 
-              await Future.forEach<WidgetsToImageController>(controllers,
-                  (e) async {
-                print(e.toString());
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              saveImages(context, state);
+            });
 
-                await e.capture().then((value) async {
-                  files.add(XFile.fromData(
-                    Uint8List.fromList(value!),
-                    name: state.itemCodeDesc.toString(),
-                    mimeType: 'image/png',
-                  ));
-                });
-              });
-
-              Share.shareXFiles(files);
-            } catch (e) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('Oluşturulurken hata oluştu ${e.toString()}')));
-            }
             setState(() {
               isCreating = false;
             });
@@ -251,35 +258,178 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
   Widget buildProduct(PhotoPageState state) {
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.6,
+      width: MediaQuery.of(context).size.width,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: List.generate(
+            widget.photoList?.length ?? 0,
+            (index) => Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: Center(
+                child: WidgetsToImage(
+                  controller: controllers[index],
+                  child: AspectRatio(
+                    aspectRatio: 4 / 5,
+                    child: InkWell(
+                      onDoubleTap: () async {
+                        await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PhotoEditView(
+                                      item: photoList![index],
+                                    )));
+                        setState(() {});
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            fit: BoxFit.fitWidth,
+                            image: NetworkImage(
+                              photoList![index]
+                                      .colors?[photoList![index].currentIndex!]
+                                      .colorImage ??
+                                  '',
+                            ),
+                            onError: (error, stackTrace) => const AssetImage(
+                                'assets/could_not_load_img.jpg'),
+                          ),
+                        ),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  state.addVariants == true
+                                      ? addVariants(index, state)
+                                      : Container(),
+                                  state.showLogo == true
+                                      ? Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: SizedBox(
+                                            width: 80,
+                                            child: Image.network(
+                                              state.companyLogo ?? '',
+                                              loadingBuilder: (context, child,
+                                                      loadingProgress) =>
+                                                  loadingProgress == null
+                                                      ? child
+                                                      : const CircularProgressIndicator(),
+                                              errorBuilder:
+                                                  (context, error, stackTrace) {
+                                                return Container();
+                                              },
+                                            ),
+                                          ),
+                                        )
+                                      : Container()
+                                ],
+                              ),
+                              const Spacer(),
+                              buildInformationBant(index, state),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildProduct2(PhotoPageState state) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.6,
+      width: MediaQuery.of(context).size.width,
       child: ListView.builder(
         controller: _scrollController,
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
           return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: WidgetsToImage(
-              controller: controllers[index],
-              child: AspectRatio(
-                aspectRatio: 4 / 5,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                        fit: BoxFit.fitWidth,
-                        image: NetworkImage(photoList![index]
-                                .colors?[photoList![index].currentIndex!]
-                                .colorImage ??
-                            '')),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      state.addVariants == true
-                          ? addVariants(index, state)
-                          : Container(),
-                      buildInformationBant(index, state),
-                    ],
+            padding: const EdgeInsets.only(
+              left: 8,
+            ),
+            child: Center(
+              child: WidgetsToImage(
+                controller: controllers[index],
+                child: AspectRatio(
+                  aspectRatio: 4 / 5,
+                  child: InkWell(
+                    onDoubleTap: () async {
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PhotoEditView(
+                                    item: photoList![index],
+                                  )));
+                      setState(() {});
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          fit: BoxFit.fitWidth,
+                          image: NetworkImage(photoList![index]
+                                  .colors?[photoList![index].currentIndex!]
+                                  .colorImage ??
+                              ''),
+                          onError: (error, stackTrace) =>
+                              const AssetImage('assets/could_not_load_img.jpg'),
+                        ),
+                      ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                state.addVariants == true
+                                    ? addVariants(index, state)
+                                    : Container(),
+                                state.showLogo == true
+                                    ? Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: SizedBox(
+                                          width: 80,
+                                          child: Image.network(
+                                            state.companyLogo ?? '',
+                                            loadingBuilder: (context, child,
+                                                    loadingProgress) =>
+                                                loadingProgress == null
+                                                    ? child
+                                                    : const CircularProgressIndicator(),
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return IconButton(
+                                                  onPressed: () {},
+                                                  icon: const Icon(Icons
+                                                      .upload_file_outlined));
+                                            },
+                                          ),
+                                        ))
+                                    : Container()
+                              ],
+                            ),
+                            const Spacer(),
+                            buildInformationBant(index, state),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -299,49 +449,32 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
           .colors!
           .where((element) =>
               element !=
-              photoList![index].colors![photoList![index].currentIndex!])
+                  photoList![index].colors![photoList![index].currentIndex!] &&
+              element.colorImage.isNotNullOrNoEmpty)
           .map((e) => Padding(
               padding: const EdgeInsets.all(8.0),
-              child: badges.Badge(
-                badgeStyle: badges.BadgeStyle(
-                    badgeColor:
-                        isCreating == false ? Colors.grey : Colors.transparent),
-                badgeContent: InkWell(
-                  onTap: () {
-                    setState(() {
-                      photoList![index]
-                          .colors!
-                          .removeAt(photoList![index].colors!.indexOf(e));
-                    });
-                  },
-                  child: Text(
-                    isCreating == false ? 'X' : '',
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-                child: InkWell(
-                  onTap: () {
-                    setState(() {
-                      photoList![index].currentIndex =
-                          photoList![index].colors!.indexOf(e);
-                    });
-                  },
-                  child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image: NetworkImage(e.colorImage ?? '')),
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Text(
-                        state.showStock == true ? '${e.stock}' : '',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: ColorConstants.mtPrimary),
-                      )),
-                ),
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    photoList![index].currentIndex =
+                        photoList![index].colors!.indexOf(e);
+                  });
+                },
+                child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image: NetworkImage(e.colorImage ?? '')),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Text(
+                      state.showStock == true ? '${e.stock}' : '',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: ColorConstants.mtPrimary),
+                    )),
               )))
           .toList(),
     );
@@ -361,13 +494,21 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("#${widget.photoList![index].itemCode}",
-                    style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold)),
-                Text(
-                  photoList![index].itemDescription ?? '',
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  child: Text("#${widget.photoList![index].itemCode}",
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold)),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  child: Text(
+                    photoList![index].itemDescription ?? '',
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 )
               ],
             ),

@@ -3,7 +3,7 @@
 
 
     <application
-        android:label="tk_photo"
+        android:label="TK Photo"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

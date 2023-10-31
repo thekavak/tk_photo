@@ -49,6 +49,13 @@ dependencies:
   popup_banner: ^1.0.0
   another_flutter_splash_screen: ^1.2.0
   badges: ^3.1.2
+  path_provider: ^2.0.11
+  file_picker: ^5.2.2
+  cached_network_image: ^3.3.0
+  flutter_easyloading: ^3.0.5
+  #bunun android ayarı var 
+  image_cropper: any
+
 
 
   widgets_to_image: ^0.0.2

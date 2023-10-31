@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/model_old/product_detail_model.dart';
 import '../../product/constant/app_process_enum.dart';
+import '../../service/shared_preferences.dart';
 
 enum AppPropertiesEnum {
   addVariants,
@@ -22,9 +23,20 @@ final productPhotoProvider =
 class ProductPhotoProvider extends StateNotifier<PhotoPageState> {
   ProductPhotoProvider() : super(const PhotoPageState());
 
-  changeIndex(
-    int index,
-  ) {
+  init() async {
+    String? companyLogo = await MySharedPreferences.instance
+        .getStringValue(mySharedKey.TKP_COMPANY_LOGO);
+
+    state = state.copyWith(companyLogo: companyLogo);
+  }
+
+  removeColor(String colorCode) {
+    List<ProductDetail>? colors = state.colors;
+    colors?.removeWhere((element) => element.colorCode == colorCode);
+    state = state.copyWith(colors: colors);
+  }
+
+  changeIndex(int index) {
     state = state.copyWith(currentIndex: index);
     print("index$index");
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kartal/kartal.dart';
 
@@ -81,7 +82,7 @@ class _ProductQueryViewState extends ConsumerState<ProductQueryView> {
           height: context.dynamicHeight(0.015),
         ),
         ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (providerKeyword.searchController.text.isEmpty) {
                 // haata mesajı
                 const error =
@@ -90,9 +91,13 @@ class _ProductQueryViewState extends ConsumerState<ProductQueryView> {
 
                 return;
               }
+
+              EasyLoading.show(status: "Yükleniyor...");
+
               // ürün sorgulamadan buradan data gönderiyoruz
-              providerKeyword.getProductList(context,
+              await providerKeyword.getProductList(context,
                   param: {"keyword": providerKeyword.searchController.text});
+              EasyLoading.dismiss();
             },
             style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 48)),

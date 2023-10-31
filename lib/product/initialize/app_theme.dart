@@ -67,6 +67,12 @@ class AppTheme {
           iconTheme: IconThemeData(color: Colors.white),
         ),
         scaffoldBackgroundColor: Colors.white,
+        switchTheme: SwitchThemeData(
+          thumbColor: MaterialStateProperty.all(Colors.white),
+          overlayColor: MaterialStateProperty.all(
+            ColorConstants.mtPrimary.withOpacity(0.2),
+          ),
+        ),
         inputDecorationTheme: const InputDecorationTheme(
           filled: true,
           isDense: true,

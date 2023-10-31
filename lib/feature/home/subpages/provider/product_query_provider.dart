@@ -32,8 +32,12 @@ class ProductQueryNotifier extends StateNotifier<ProductQueryState> {
     );
   }
 
-  void getProductList(BuildContext context,
+  getProductList(BuildContext context,
       {required Map<String, dynamic> param}) async {
+    if (state.appState == ApppProcessStatus.loading) {
+      return;
+    }
+
     String? error;
 
     FocusScope.of(context).requestFocus(FocusNode());
@@ -81,6 +85,7 @@ class ProductQueryNotifier extends StateNotifier<ProductQueryState> {
         ),
       );
     }
+    print("çıktı");
   }
 
   Future<void> scanBarcodeNormal(BuildContext context) async {

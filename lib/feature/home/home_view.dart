@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kartal/kartal.dart';
 import 'package:tk_photo/product/constant/app_menu_list.dart';
 import 'package:tk_photo/service/shared_preferences.dart';
 
 import '../../core/model/general_list_model.dart';
+import '../main/main_provider.dart';
 import 'home_provider.dart';
 
 class HomePageView extends ConsumerStatefulWidget {
@@ -59,6 +61,17 @@ class _HomePageViewState extends ConsumerState<HomePageView> {
                 Text('Depo', style: context.textTheme.labelMedium),
                 const SizedBox(height: 10),
                 buildWarehouseDropbox(),
+                const SizedBox(height: 10),
+                SwitchListTile(
+                  title: const Text('Fotoğraf Yükleme Modu'),
+                  value: ref.watch(mainProvider).isPhotoUploadMode,
+                  onChanged: (value) async {
+                    EasyLoading.show(status: 'Lütfen Bekleyiniz...');
+                    await Future.delayed(const Duration(milliseconds: 1500));
+                    ref.read(mainProvider).changePhotoUploadMode();
+                    EasyLoading.dismiss();
+                  },
+                ),
               ],
             ),
           ),

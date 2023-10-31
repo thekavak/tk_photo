@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tk_photo/product/widgets/button/app_elevated_button.dart';
 
@@ -42,6 +43,7 @@ class _AttributesViewState extends ConsumerState<AttributesView> {
                                 Text(e.attributeTypeDescription.toString()),
                                 const SizedBox(height: 10),
                                 DropdownButtonFormField(
+                                  isExpanded: true,
                                   onChanged: (value) {
                                     setState(() {
                                       e.options?.forEach((element) {
@@ -74,6 +76,7 @@ class _AttributesViewState extends ConsumerState<AttributesView> {
               child: AppElevatedButton(
                   title: 'Ürün Getir',
                   callback: () async {
+                    EasyLoading.show(status: 'Yükleniyor...');
                     var param = <String, dynamic>{};
                     for (var item in attributesList) {
                       if (item.options != null) {
@@ -88,9 +91,10 @@ class _AttributesViewState extends ConsumerState<AttributesView> {
                       }
                     }
 
-                    ref
+                    await ref
                         .watch(productProvider.notifier)
                         .getProductList(context, param: param);
+                    EasyLoading.dismiss();
                   }),
             )
           ],

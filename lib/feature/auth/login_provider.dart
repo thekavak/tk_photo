@@ -62,9 +62,11 @@ class LoginFormProvider extends ChangeNotifier {
     try {
       var response = await _networkManager.loginUser(
           username: _username, password: _password);
-
+      print("response: $response  ");
+      print("response: $response  ");
       if (response != null) {
         if (response.state == true) {
+          print("state: ${response.state}  ");
           // user login data
           await MySharedPreferences.instance
               .setLoggedInUserData(response.data?.first);
@@ -95,8 +97,9 @@ class LoginFormProvider extends ChangeNotifier {
         return AppApiStatusModel(message: response.message, result: false);
       }
     } catch (e) {
+      print(e);
       return AppApiStatusModel(
-          message: "Daha sonra tekrar deneyiniz.", result: false);
+          message: "Daha sonra tekrar deneyiniz #101.", result: false);
     }
     return null;
   }

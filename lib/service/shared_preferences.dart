@@ -38,6 +38,7 @@ class MySharedPreferences {
       MySharedPreferences._privateConstructor();
 
   Future<void> setLoggedInUserData(LoginModelData? user) async {
+    print(user?.toJson());
     final prefs = await SharedPreferences.getInstance();
     prefs.clear();
     String? encodedData = user == null ? "" : jsonEncode(user.toJson());

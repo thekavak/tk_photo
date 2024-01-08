@@ -29,6 +29,8 @@ enum mySharedKey {
   TKP_GLOBAL_FILTER_CATEGORY,
   // ignore: constant_identifier_names
   TKP_GLOBAL_FILTER_ATTRIBUTES,
+  // ignore: constant_identifier_names
+  TKP_ASPECT_RATIO,
 }
 
 class MySharedPreferences {
@@ -122,5 +124,15 @@ class MySharedPreferences {
   Future<void> removeUserLogout() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.clear();
+  }
+
+  Future<void> setSAspectRatio(double value) async {
+    SharedPreferences myPrefs = await SharedPreferences.getInstance();
+    await myPrefs.setDouble(mySharedKey.TKP_ASPECT_RATIO.name, value);
+  }
+
+  Future<double?> getAspectRatio() async {
+    SharedPreferences myPrefs = await SharedPreferences.getInstance();
+    return myPrefs.getDouble(mySharedKey.TKP_ASPECT_RATIO.name) ?? 1 / 1;
   }
 }

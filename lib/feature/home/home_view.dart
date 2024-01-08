@@ -7,6 +7,7 @@ import 'package:tk_photo/service/shared_preferences.dart';
 
 import '../../core/model/general_list_model.dart';
 import '../main/main_provider.dart';
+import '../settings/save_ratio.dart';
 import 'home_provider.dart';
 
 class HomePageView extends ConsumerStatefulWidget {
@@ -34,6 +35,17 @@ class _HomePageViewState extends ConsumerState<HomePageView> {
           title: const Text('TK Photo',
               style: TextStyle(color: Colors.white, fontSize: 20)),
           actions: [
+            //settting
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute<void>(
+                    builder: (BuildContext context) {
+                      return const ChangeRatio();
+                    },
+                    fullscreenDialog: true));
+              },
+              icon: const Icon(Icons.settings),
+            ),
             IconButton(
               onPressed: () {
                 MySharedPreferences.instance.removeUserLogout();

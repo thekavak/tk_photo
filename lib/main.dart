@@ -5,6 +5,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tk_photo/feature/auth/login_view.dart';
 import 'package:tk_photo/feature/home/home_view.dart';
+import 'package:tk_photo/feature/settings/save_ratio.dart';
 import 'package:tk_photo/product/constant/app_color.dart';
 import 'package:tk_photo/product/initialize/app_theme.dart';
 

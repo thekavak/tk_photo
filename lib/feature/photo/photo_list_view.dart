@@ -44,6 +44,109 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
   @override
   Widget build(BuildContext context) {
     var state = ref.watch(productPhotoProvider);
+    double width = MediaQuery.of(context).size.width; // Ekranın genişliğini al
+    double height =
+        width / state.aspectRatio!; // Yüksekliği hesaplaÖrneğin ekranın %60'ı
+    print(state.aspectRatio!);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Photo List', style: TextStyle(color: Colors.white)),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+              height: height,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: (photoList ?? [])
+                      .map((e) => buildOneImage(
+                            state,
+                            e,
+                          ))
+                      .toList(),
+                ),
+              ),
+            ),
+            saveButton(context, state),
+            const Divider(),
+            settings(state),
+            const SizedBox(
+              height: 100,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Padding buildOneImage(PhotoPageState state, ProductListModel e) {
+    return Padding(
+      padding:
+          const EdgeInsets.only(left: 16.0, bottom: 16, top: 16, right: 16),
+      child: WidgetsToImage(
+        controller: controllers[photoList!.indexOf(e)],
+        child: AspectRatio(
+          aspectRatio: state.aspectRatio!,
+          child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                fit: BoxFit.cover,
+                onError: (error, stackTrace) =>
+                    const Center(child: Text('Resim Yüklenemedi')),
+                image: NetworkImage(
+                  e.colors?[e.currentIndex!].colorImage ?? '',
+                  scale: 1,
+                ),
+              ),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    state.addVariants == true
+                        ? addVariants(e.currentIndex!, state)
+                        : Container(),
+                    state.showLogo == true
+                        ? Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SizedBox(
+                              width: 80,
+                              child: Image.network(
+                                state.companyLogo ?? '',
+                                loadingBuilder: (context, child,
+                                        loadingProgress) =>
+                                    loadingProgress == null
+                                        ? child
+                                        : const CircularProgressIndicator(),
+                                errorBuilder: (context, error, stackTrace) {
+                                  return IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(
+                                          Icons.upload_file_outlined));
+                                },
+                              ),
+                            ))
+                        : Container()
+                  ],
+                ),
+                const Spacer(),
+                buildInformationBant(e.currentIndex!, state),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+/*
+  @override
+  Widget build(BuildContext context) {
+    var state = ref.watch(productPhotoProvider);
 
     return Scaffold(
         appBar: AppBar(
@@ -55,7 +158,88 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              buildLoading(state),
+              //buildLoading(state),
+              SizedBox(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: ListView(
+                  shrinkWrap: true,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: AspectRatio(
+                          aspectRatio: state.aspectRatio!,
+                          child: Container(
+                              height: MediaQuery.of(context).size.height * 0.6,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                    photoList![state.currentIndex!]
+                                            .colors?[
+                                                photoList![state.currentIndex!]
+                                                    .currentIndex!]
+                                            .colorImage ??
+                                        '',
+                                  ),
+                                  onError: (error, stackTrace) =>
+                                      const AssetImage(
+                                          'assets/could_not_load_img.jpg'),
+                                ),
+                              ),
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        state.addVariants == true
+                                            ? addVariants(
+                                                state.currentIndex!, state)
+                                            : Container(),
+                                        state.showLogo == true
+                                            ? Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: SizedBox(
+                                                  width: 80,
+                                                  child: Image.network(
+                                                    state.companyLogo ?? '',
+                                                    loadingBuilder: (context,
+                                                            child,
+                                                            loadingProgress) =>
+                                                        loadingProgress == null
+                                                            ? child
+                                                            : const CircularProgressIndicator(),
+                                                    errorBuilder: (context,
+                                                        error, stackTrace) {
+                                                      return IconButton(
+                                                          onPressed: () {},
+                                                          icon: const Icon(Icons
+                                                              .upload_file_outlined));
+                                                    },
+                                                  ),
+                                                ))
+                                            : Container()
+                                      ],
+                                    ),
+                                    const Spacer(),
+                                    buildInformationBant(
+                                        state.currentIndex!, state),
+                                  ],
+                                ),
+                              ))),
+                    )
+                  ],
+                ),
+              ),
               saveButton(context, state),
               const Divider(),
               settings(state),
@@ -65,8 +249,7 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
             ],
           ),
         ));
-  }
-
+  } */
   Padding settings(PhotoPageState state) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -256,85 +439,141 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
   }
 
   Widget buildProduct(PhotoPageState state) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.6,
-      width: MediaQuery.of(context).size.width,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: List.generate(
-            widget.photoList?.length ?? 0,
-            (index) => Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: Center(
-                child: WidgetsToImage(
-                  controller: controllers[index],
-                  child: AspectRatio(
-                    aspectRatio: 4 / 5,
-                    child: InkWell(
-                      onDoubleTap: () async {
-                        await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => PhotoEditView(
-                                      item: photoList![index],
-                                    )));
-                        setState(() {});
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            fit: BoxFit.fitWidth,
-                            image: NetworkImage(
-                              photoList![index]
-                                      .colors?[photoList![index].currentIndex!]
-                                      .colorImage ??
-                                  '',
-                            ),
-                            onError: (error, stackTrace) => const AssetImage(
-                                'assets/could_not_load_img.jpg'),
-                          ),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: List.generate(
+          widget.photoList?.length ?? 0,
+          (index) => Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: AspectRatio(
+                aspectRatio: state.aspectRatio!,
+                child: Container(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: NetworkImage(
+                          photoList![state.currentIndex!]
+                                  .colors?[photoList![state.currentIndex!]
+                                      .currentIndex!]
+                                  .colorImage ??
+                              '',
                         ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                        onError: (error, stackTrace) =>
+                            const AssetImage('assets/could_not_load_img.jpg'),
+                      ),
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  state.addVariants == true
-                                      ? addVariants(index, state)
-                                      : Container(),
-                                  state.showLogo == true
-                                      ? Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: SizedBox(
-                                            width: 80,
-                                            child: Image.network(
-                                              state.companyLogo ?? '',
-                                              loadingBuilder: (context, child,
-                                                      loadingProgress) =>
-                                                  loadingProgress == null
-                                                      ? child
-                                                      : const CircularProgressIndicator(),
-                                              errorBuilder:
-                                                  (context, error, stackTrace) {
-                                                return Container();
-                                              },
-                                            ),
-                                          ),
-                                        )
-                                      : Container()
-                                ],
-                              ),
-                              const Spacer(),
-                              buildInformationBant(index, state),
+                              state.addVariants == true
+                                  ? addVariants(state.currentIndex!, state)
+                                  : Container(),
+                              state.showLogo == true
+                                  ? Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: SizedBox(
+                                        width: 80,
+                                        child: Image.network(
+                                          state.companyLogo ?? '',
+                                          loadingBuilder: (context, child,
+                                                  loadingProgress) =>
+                                              loadingProgress == null
+                                                  ? child
+                                                  : const CircularProgressIndicator(),
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return IconButton(
+                                                onPressed: () {},
+                                                icon: const Icon(Icons
+                                                    .upload_file_outlined));
+                                          },
+                                        ),
+                                      ))
+                                  : Container()
                             ],
                           ),
+                          const Spacer(),
+                          buildInformationBant(state.currentIndex!, state),
+                        ],
+                      ),
+                    ))),
+          ), /*  Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: Center(
+              child: WidgetsToImage(
+                controller: controllers[index],
+                child: AspectRatio(
+                  aspectRatio: state.aspectRatio!,
+                  child: InkWell(
+                    onDoubleTap: () async {
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PhotoEditView(
+                                    item: photoList![index],
+                                  )));
+                      setState(() {});
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          fit: BoxFit.contain,
+                          image: NetworkImage(
+                            photoList![index]
+                                    .colors?[photoList![index].currentIndex!]
+                                    .colorImage ??
+                                '',
+                          ),
+                          onError: (error, stackTrace) =>
+                              const AssetImage('assets/could_not_load_img.jpg'),
+                        ),
+                      ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                state.addVariants == true
+                                    ? addVariants(index, state)
+                                    : Container(),
+                                state.showLogo == true
+                                    ? Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: SizedBox(
+                                          width: 80,
+                                          child: Image.network(
+                                            state.companyLogo ?? '',
+                                            loadingBuilder: (context, child,
+                                                    loadingProgress) =>
+                                                loadingProgress == null
+                                                    ? child
+                                                    : const CircularProgressIndicator(),
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Container();
+                                            },
+                                          ),
+                                        ),
+                                      )
+                                    : Container()
+                              ],
+                            ),
+                            const Spacer(),
+                            buildInformationBant(index, state),
+                          ],
                         ),
                       ),
                     ),
@@ -342,16 +581,19 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
                 ),
               ),
             ),
-          ),
+          ),*/
         ),
       ),
     );
   }
 
   Widget buildProduct2(PhotoPageState state) {
+    double calculatedWidth =
+        MediaQuery.of(context).size.height * 0.6 * state.aspectRatio!;
+
     return SizedBox(
+      width: calculatedWidth,
       height: MediaQuery.of(context).size.height * 0.6,
-      width: MediaQuery.of(context).size.width,
       child: ListView.builder(
         controller: _scrollController,
         scrollDirection: Axis.horizontal,
@@ -495,7 +737,6 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.5,
                   child: Text("#${widget.photoList![index].itemCode}",
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -504,7 +745,6 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
                           fontWeight: FontWeight.bold)),
                 ),
                 SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.7,
                   child: Text(
                     photoList![index].itemDescription ?? '',
                     overflow: TextOverflow.ellipsis,

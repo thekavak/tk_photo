@@ -27,7 +27,9 @@ class ProductPhotoProvider extends StateNotifier<PhotoPageState> {
     String? companyLogo = await MySharedPreferences.instance
         .getStringValue(mySharedKey.TKP_COMPANY_LOGO);
 
-    state = state.copyWith(companyLogo: companyLogo);
+    double? aspectRatio =
+        await MySharedPreferences.instance.getAspectRatio() ?? 1 / 1;
+    state = state.copyWith(companyLogo: companyLogo, aspectRatio: aspectRatio);
   }
 
   removeColor(String colorCode) {
@@ -92,6 +94,7 @@ class PhotoPageState extends Equatable {
     this.showBasePrice = true,
     this.showStock = true,
     this.showOnlyOneStock = false,
+    this.aspectRatio = 1.0,
   });
 
   final ApppProcessStatus appState;
@@ -112,6 +115,7 @@ class PhotoPageState extends Equatable {
   final bool? showBasePrice;
   final bool? showStock;
   final bool? showOnlyOneStock;
+  final double? aspectRatio;
 
   @override
   List<Object?> get props => [
@@ -133,6 +137,7 @@ class PhotoPageState extends Equatable {
         showBasePrice,
         showStock,
         showOnlyOneStock,
+        aspectRatio,
       ];
 
   PhotoPageState copyWith({
@@ -154,6 +159,7 @@ class PhotoPageState extends Equatable {
     bool? showBasePrice,
     bool? showStock,
     bool? showOnlyOneStock,
+    double? aspectRatio,
   }) {
     return PhotoPageState(
       appState: appState ?? this.appState,
@@ -174,6 +180,7 @@ class PhotoPageState extends Equatable {
       showBasePrice: showBasePrice ?? this.showBasePrice,
       showStock: showStock ?? this.showStock,
       showOnlyOneStock: showOnlyOneStock ?? this.showOnlyOneStock,
+      aspectRatio: aspectRatio ?? this.aspectRatio,
     );
   }
 }

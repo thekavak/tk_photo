@@ -68,9 +68,9 @@ class _ChangeRatioState extends ConsumerState<ChangeRatio> {
             Wrap(
               children: [
                 buildAspectRatioBox(1 / 1, '1:1'),
-                buildAspectRatioBox(3 / 2, '3:2'),
+                buildAspectRatioBox(2 / 3, '2:3'),
                 buildAspectRatioBox(9 / 16, '9:16'),
-                buildAspectRatioBox(4 / 3, '4:3'),
+                buildAspectRatioBox(3 / 4, '3:4'),
               ],
             ),
             // Add more widgets here if needed

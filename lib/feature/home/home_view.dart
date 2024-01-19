@@ -30,6 +30,7 @@ class _HomePageViewState extends ConsumerState<HomePageView> {
   Widget build(BuildContext context) {
     //Menu listesi
     final menuList = AppMenuList().menuList;
+
     return Scaffold(
         appBar: AppBar(
           title: const Text('TK Photo',
@@ -74,20 +75,27 @@ class _HomePageViewState extends ConsumerState<HomePageView> {
                 const SizedBox(height: 10),
                 buildWarehouseDropbox(),
                 const SizedBox(height: 10),
-                SwitchListTile(
-                  title: const Text('Fotoğraf Yükleme Modu'),
-                  value: ref.watch(mainProvider).isPhotoUploadMode,
-                  onChanged: (value) async {
-                    EasyLoading.show(status: 'Lütfen Bekleyiniz...');
-                    await Future.delayed(const Duration(milliseconds: 1500));
-                    ref.read(mainProvider).changePhotoUploadMode();
-                    EasyLoading.dismiss();
-                  },
-                ),
+                imageUploadSwitch(),
               ],
             ),
           ),
         ));
+  }
+
+  Widget imageUploadSwitch() {
+    var state = ref.read(homeProvider.notifier);
+    return state.uploadModuleActive == 1
+        ? SwitchListTile(
+            title: const Text('Fotoğraf Yükleme Modülü'),
+            value: ref.watch(mainProvider).isPhotoUploadMode,
+            onChanged: (value) async {
+              EasyLoading.show(status: 'Lütfen Bekleyiniz...');
+              await Future.delayed(const Duration(milliseconds: 1500));
+              ref.read(mainProvider).changePhotoUploadMode();
+              EasyLoading.dismiss();
+            },
+          )
+        : Container();
   }
 
   DropdownButtonFormField<Object?> buildWarehouseDropbox() {

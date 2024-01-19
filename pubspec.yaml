@@ -42,7 +42,7 @@ dependencies:
   dio: ^5.1.2
   shared_preferences: ^2.1.1
   lottie: ^2.4.0
-  intl: ^0.18.1
+  intl: ^0.18.0
 
   modal_bottom_sheet: ^3.0.0-pre
   flutter_barcode_scanner: ^2.0.0
@@ -55,6 +55,7 @@ dependencies:
   flutter_easyloading: ^3.0.5
   #bunun android ayarı var 
   image_cropper: any
+  easy_localization: ^3.0.0
 
 
 

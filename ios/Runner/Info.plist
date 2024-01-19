@@ -51,5 +51,12 @@
 	<string>Camera permission is required for barcode scanning.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Photo library permission is required for save photo.</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>tr</string>
+		<string>de</string>
+		<string>ru</string>
+	</array>
 </dict>
 </plist>

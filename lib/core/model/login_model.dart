@@ -38,6 +38,7 @@ class LoginModelData {
   String? serviceURL;
   String? companyLogo;
   int? isActive;
+  int? uploadModule;
   String? errorMSG;
   int? licenceCheckIntervalDay;
   int? isSingleLicence;
@@ -56,6 +57,7 @@ class LoginModelData {
       this.serviceURL,
       this.companyLogo,
       this.isActive,
+      this.uploadModule,
       this.errorMSG,
       this.licenceCheckIntervalDay,
       this.isSingleLicence,
@@ -74,6 +76,7 @@ class LoginModelData {
     serviceURL = json['ServiceURL'];
     companyLogo = json['CompanyLogo'];
     isActive = json['IsActive'];
+    uploadModule = json['UploadModule'];
     errorMSG = json['ErrorMSG'];
     licenceCheckIntervalDay = json['LicenceCheckIntervalDay'];
     isSingleLicence = json['isSingleLicence'];
@@ -100,6 +103,7 @@ class LoginModelData {
     data['ServiceURL'] = serviceURL;
     data['CompanyLogo'] = companyLogo;
     data['IsActive'] = isActive;
+    data['UploadModule'] = uploadModule;
     data['ErrorMSG'] = errorMSG;
     data['LicenceCheckIntervalDay'] = licenceCheckIntervalDay;
     data['isSingleLicence'] = isSingleLicence;

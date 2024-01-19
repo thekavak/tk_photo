@@ -6,6 +6,7 @@ class ProductListModel {
   String? tRYPrice;
   bool? isSelected;
   int? currentIndex;
+  int? packageQuantity;
   List<ColorsList>? colors;
 
   ProductListModel(
@@ -16,6 +17,7 @@ class ProductListModel {
       this.tRYPrice,
       this.isSelected = false,
       this.currentIndex = 0,
+      this.packageQuantity,
       this.colors});
 
   ProductListModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class ProductListModel {
     tRYPrice = json['TRYPrice'];
     isSelected = false;
     currentIndex = 0;
+    packageQuantity = json['Package'];
     if (json['Colors'] != null) {
       colors = <ColorsList>[];
       json['Colors'].forEach((v) {
@@ -43,6 +46,7 @@ class ProductListModel {
     data['TRYPrice'] = tRYPrice;
     data['isSelected'] = isSelected;
     data['currentIndex'] = currentIndex;
+    data['Package'] = packageQuantity;
     if (colors != null) {
       data['Colors'] = colors!.map((v) => v.toJson()).toList();
     }

@@ -31,11 +31,15 @@ class HomePageProvider extends ChangeNotifier {
 
   String? _selectedPrice;
   String? _selectedWarehouse;
+  int? _uploadModuleActive = 0;
 
   String? get selectedPrice => _selectedPrice;
   String? get selectedWarehouse => _selectedWarehouse;
+  int? get uploadModuleActive => _uploadModuleActive;
 
   init() async {
+    _uploadModuleActive = await MySharedPreferences.instance
+        .getIntValue(mySharedKey.TKP_UPLOAD_MODULE_ACTIVE);
     await getGlobalFilterData();
   }
 

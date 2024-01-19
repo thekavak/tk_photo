@@ -30,7 +30,11 @@ enum mySharedKey {
   // ignore: constant_identifier_names
   TKP_GLOBAL_FILTER_ATTRIBUTES,
   // ignore: constant_identifier_names
+<<<<<<< Updated upstream
   TKP_ASPECT_RATIO,
+=======
+  TKP_UPLOAD_MODULE_ACTIVE
+>>>>>>> Stashed changes
 }
 
 class MySharedPreferences {
@@ -57,6 +61,8 @@ class MySharedPreferences {
         mySharedKey.TKP_COMPANY_LOGO.name, user?.companyLogo ?? '');
     await prefs.setBool(
         mySharedKey.TKP_LICENCE.name, user?.isActive == 1 ? true : false);
+    await prefs.setInt(
+        mySharedKey.TKP_UPLOAD_MODULE_ACTIVE.name, user?.uploadModule ?? 0);
   }
 
   Future<void> setGlobalFilterModel(

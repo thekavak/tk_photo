@@ -1,4 +1,5 @@
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -14,6 +15,8 @@ import 'service/shared_preferences.dart';
 String? username;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+
   username = await MySharedPreferences.instance
       .getStringValue(mySharedKey.TKP_USER_NAME);
   if (kDebugMode) {

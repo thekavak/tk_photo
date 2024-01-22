@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:tk_photo/core/model/parameters_model.dart';
 import 'package:tk_photo/service/shared_preferences.dart';
 
@@ -52,17 +53,17 @@ class NetworkManager {
             data: formData);
 
         if (uploadResponse.statusCode == 200) {
-          print("uploadResponse.data");
           return FileResponse.fromJson(uploadResponse.data);
         } else {
-          print("uploadResponasase");
           return null;
         }
       } else {
         throw Exception("Servis adresi bulunamadı");
       }
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
       rethrow;
     }
   }
@@ -77,14 +78,15 @@ class NetworkManager {
         'username': username,
         'password': password
       });
-
-      print(userData.realUri);
       if (userData.statusCode == 200) {
         loginModel = LoginModel.fromJson(userData.data);
       }
       return loginModel;
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
+
       rethrow;
     }
   }
@@ -104,7 +106,7 @@ class NetworkManager {
           serviceUrl,
           options: Options(headers: {'Accept': 'application/json'}),
         );
-        print(response.realUri);
+
         if (response.statusCode == 200) {
           return ParameterModel.fromJson(response.data);
         } else {
@@ -129,15 +131,45 @@ class NetworkManager {
       var serviceUrl = await MySharedPreferences.instance
           .getStringValue(mySharedKey.TKP_SERVICE_URL);
 
+      var priceList = await MySharedPreferences.instance
+              .getGlobalFilterModel(mySharedKey.TKP_GLOBAL_FILTER_PRICE_LIST) ??
+          [];
+
+      var warehouseList = await MySharedPreferences.instance
+              .getGlobalFilterModel(mySharedKey.TKP_GLOBAL_FILTER_WAREHOUSE) ??
+          [];
+
+      var price = priceList
+              .where((element) => element.isSelected == true)
+              .isNotEmpty
+          ? priceList.where((element) => element.isSelected == true).first.code
+          : priceList.first.code;
+
+      var warehouse = warehouseList
+              .where((element) => element.isSelected == true)
+              .isNotEmpty
+          ? warehouseList
+              .where((element) => element.isSelected == true)
+              .first
+              .code
+          : warehouseList.first.code;
+
       _dio.options.queryParameters.addAll(
           {'username': username, 'method': GetApiMethod.productQuery.method});
+
+      _dio.options.queryParameters
+          .addAll({'priceCode': price, 'warehouseCode': warehouse});
+
       if (serviceUrl != null && serviceUrl.isNotEmpty) {
         final response = await _dio.get(
           serviceUrl,
           queryParameters: params,
           options: Options(headers: {'Accept': 'application/json'}),
         );
-        print(response.realUri);
+        if (kDebugMode) {
+          print(response.realUri);
+        }
+
         if (response.statusCode == 200) {
           return response.data
               .map<ProductListModel>((json) => ProductListModel.fromJson(json))
@@ -149,7 +181,9 @@ class NetworkManager {
         throw Exception("Servis adresi bulunamadı");
       }
     } catch (e) {
-      print("Hata: $e");
+      if (kDebugMode) {
+        print(e);
+      }
 
       rethrow;
     }

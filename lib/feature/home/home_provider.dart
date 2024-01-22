@@ -39,10 +39,47 @@ class HomePageProvider extends ChangeNotifier {
     await getGlobalFilterData();
   }
 
+  setPriceList(String? code) async {
+    for (var element in _priceList) {
+      if (element.code == code) {
+        element.isSelected = true;
+      } else {
+        element.isSelected = false;
+      }
+    }
+    await MySharedPreferences.instance.setGlobalFilterModel(
+      _priceList,
+      mySharedKey.TKP_GLOBAL_FILTER_PRICE_LIST,
+    );
+
+    await getGlobalFilterData();
+    notifyListeners();
+  }
+
+  setWarehouseList(String? code) async {
+    for (var element in _warehouseList) {
+      if (element.code == code) {
+        element.isSelected = true;
+      } else {
+        element.isSelected = false;
+      }
+    }
+
+    await MySharedPreferences.instance.setGlobalFilterModel(
+      _warehouseList,
+      mySharedKey.TKP_GLOBAL_FILTER_WAREHOUSE,
+    );
+
+    await getGlobalFilterData();
+
+    notifyListeners();
+  }
+
   Future<void> getGlobalFilterData() async {
     _priceList = await MySharedPreferences.instance
             .getGlobalFilterModel(mySharedKey.TKP_GLOBAL_FILTER_PRICE_LIST) ??
         [];
+
     _warehouseList = await MySharedPreferences.instance
             .getGlobalFilterModel(mySharedKey.TKP_GLOBAL_FILTER_WAREHOUSE) ??
         [];
@@ -55,8 +92,15 @@ class HomePageProvider extends ChangeNotifier {
             .getAttributes(mySharedKey.TKP_GLOBAL_FILTER_ATTRIBUTES) ??
         [];
 
-    _selectedPrice = _priceList.first.code;
-    _selectedWarehouse = _warehouseList.first.code;
+    _selectedPrice =
+        _priceList.where((element) => element.isSelected == true).isNotEmpty
+            ? _priceList.where((element) => element.isSelected!).first.code
+            : _priceList.first.code;
+
+    _selectedWarehouse =
+        _warehouseList.where((element) => element.isSelected == true).isNotEmpty
+            ? _warehouseList.where((element) => element.isSelected!).first.code
+            : _warehouseList.first.code;
 
     notifyListeners();
   }

@@ -8,7 +8,7 @@ class GeneralListType {
   GeneralListType.fromJson(Map<String, dynamic> json) {
     code = json['Code'].toString();
     name = json['Name'];
-    isSelected = false;
+    isSelected = json['isSelected'];
   }
 
   Map<String, dynamic> toJson() {

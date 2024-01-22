@@ -50,7 +50,7 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
     print(state.aspectRatio!);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Photo List', style: TextStyle(color: Colors.white)),
+        title: const Text('Önizleme', style: TextStyle(color: Colors.white)),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -89,53 +89,61 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
         controller: controllers[photoList!.indexOf(e)],
         child: AspectRatio(
           aspectRatio: state.aspectRatio!,
-          child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                fit: BoxFit.cover,
-                onError: (error, stackTrace) =>
-                    const Center(child: Text('Resim Yüklenemedi')),
-                image: NetworkImage(
-                  e.colors?[e.currentIndex!].colorImage ?? '',
-                  scale: 1,
+          child: InkWell(
+            onDoubleTap: () async {
+              await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => PhotoEditView(
+                            item: e,
+                          )));
+              setState(() {});
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  onError: (error, stackTrace) =>
+                      const Center(child: Text('Resim Yüklenemedi')),
+                  image: NetworkImage(
+                    e.colors?[e.currentIndex!].colorImage ?? '',
+                    scale: 1,
+                  ),
                 ),
               ),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    state.addVariants == true
-                        ? addVariants(e.currentIndex!, state)
-                        : Container(),
-                    state.showLogo == true
-                        ? Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: SizedBox(
-                              width: 80,
-                              child: Image.network(
-                                state.companyLogo ?? '',
-                                loadingBuilder: (context, child,
-                                        loadingProgress) =>
-                                    loadingProgress == null
-                                        ? child
-                                        : const CircularProgressIndicator(),
-                                errorBuilder: (context, error, stackTrace) {
-                                  return IconButton(
-                                      onPressed: () {},
-                                      icon: const Icon(
-                                          Icons.upload_file_outlined));
-                                },
-                              ),
-                            ))
-                        : Container()
-                  ],
-                ),
-                const Spacer(),
-                buildInformationBant(e.currentIndex!, state),
-              ],
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      state.addVariants == true
+                          ? addVariants(e.currentIndex!, state)
+                          : Container(),
+                      state.showLogo == true
+                          ? Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: SizedBox(
+                                width: 80,
+                                child: Image.network(
+                                  state.companyLogo ?? '',
+                                  loadingBuilder: (context, child,
+                                          loadingProgress) =>
+                                      loadingProgress == null
+                                          ? child
+                                          : const CircularProgressIndicator(),
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container();
+                                  },
+                                ),
+                              ))
+                          : Container()
+                    ],
+                  ),
+                  const Spacer(),
+                  buildInformationBant(e.currentIndex!, state),
+                ],
+              ),
             ),
           ),
         ),
@@ -143,113 +151,6 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
     );
   }
 
-/*
-  @override
-  Widget build(BuildContext context) {
-    var state = ref.watch(productPhotoProvider);
-
-    return Scaffold(
-        appBar: AppBar(
-          title:
-              const Text('Photo List', style: TextStyle(color: Colors.white)),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              //buildLoading(state),
-              SizedBox(
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-                child: ListView(
-                  shrinkWrap: true,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: AspectRatio(
-                          aspectRatio: state.aspectRatio!,
-                          child: Container(
-                              height: MediaQuery.of(context).size.height * 0.6,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: NetworkImage(
-                                    photoList![state.currentIndex!]
-                                            .colors?[
-                                                photoList![state.currentIndex!]
-                                                    .currentIndex!]
-                                            .colorImage ??
-                                        '',
-                                  ),
-                                  onError: (error, stackTrace) =>
-                                      const AssetImage(
-                                          'assets/could_not_load_img.jpg'),
-                                ),
-                              ),
-                              child: Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        state.addVariants == true
-                                            ? addVariants(
-                                                state.currentIndex!, state)
-                                            : Container(),
-                                        state.showLogo == true
-                                            ? Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: SizedBox(
-                                                  width: 80,
-                                                  child: Image.network(
-                                                    state.companyLogo ?? '',
-                                                    loadingBuilder: (context,
-                                                            child,
-                                                            loadingProgress) =>
-                                                        loadingProgress == null
-                                                            ? child
-                                                            : const CircularProgressIndicator(),
-                                                    errorBuilder: (context,
-                                                        error, stackTrace) {
-                                                      return IconButton(
-                                                          onPressed: () {},
-                                                          icon: const Icon(Icons
-                                                              .upload_file_outlined));
-                                                    },
-                                                  ),
-                                                ))
-                                            : Container()
-                                      ],
-                                    ),
-                                    const Spacer(),
-                                    buildInformationBant(
-                                        state.currentIndex!, state),
-                                  ],
-                                ),
-                              ))),
-                    )
-                  ],
-                ),
-              ),
-              saveButton(context, state),
-              const Divider(),
-              settings(state),
-              const SizedBox(
-                height: 100,
-              )
-            ],
-          ),
-        ));
-  } */
   Padding settings(PhotoPageState state) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -385,7 +286,6 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
   void saveImages(BuildContext context, PhotoPageState state) async {
     try {
       EasyLoading.show(status: 'Resimler Oluşturuluyor');
-      List<Uint8List> images = [];
       List<XFile> files = [];
 
       await Future.forEach<WidgetsToImageController>(controllers, (e) async {

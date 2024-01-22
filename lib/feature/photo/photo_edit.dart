@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/model/product_list_model.dart';
 
+// ignore: must_be_immutable
 class PhotoEditView extends ConsumerStatefulWidget {
   ProductListModel? item;
   PhotoEditView({super.key, required this.item});
@@ -24,8 +25,8 @@ class _PhotoEditViewState extends ConsumerState<PhotoEditView> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title:
-              const Text('Product Edit', style: TextStyle(color: Colors.white)),
+          title: const Text('Ürün Düzenleme',
+              style: TextStyle(color: Colors.white)),
         ),
         body: SingleChildScrollView(
           child: Column(

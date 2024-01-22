@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/model/product_list_model.dart';
 import '../../../../product/constant/app_process_enum.dart';
 import '../../../../service/network_manager.dart';
+
 import '../product_multi_select.dart';
 
 final productProvider =
@@ -41,6 +42,8 @@ class ProductQueryNotifier extends StateNotifier<ProductQueryState> {
     String? error;
 
     FocusScope.of(context).requestFocus(FocusNode());
+
+    //get homeProvider
 
     state = state.copyWith(
       appState: ApppProcessStatus.loading,

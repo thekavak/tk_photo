@@ -24,7 +24,6 @@ class _ProductQueryViewState extends ConsumerState<ProductQueryView> {
 
   @override
   Widget build(BuildContext context) {
-    final productProviderData = ref.watch(productProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ürün Sorgulama',

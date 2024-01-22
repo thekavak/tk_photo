@@ -63,6 +63,7 @@ class MySharedPreferences {
       List<GeneralListType>? data, mySharedKey key) async {
     SharedPreferences myPrefs = await SharedPreferences.getInstance();
     String? encodedData = data == null ? "" : jsonEncode(data);
+    print(encodedData);
     await myPrefs.setString(key.name, encodedData);
   }
 
@@ -76,6 +77,7 @@ class MySharedPreferences {
   Future<List<GeneralListType>?> getGlobalFilterModel(mySharedKey key) async {
     SharedPreferences myPrefs = await SharedPreferences.getInstance();
     String? encodedData = myPrefs.getString(key.name);
+    print(encodedData);
     if (encodedData != null && encodedData.isNotEmpty) {
       List<dynamic> decodedData = jsonDecode(encodedData);
       List<GeneralListType> data = decodedData
@@ -102,6 +104,11 @@ class MySharedPreferences {
   }
 
   Future<String?> getStringValue(mySharedKey key) async {
+    SharedPreferences myPrefs = await SharedPreferences.getInstance();
+    return myPrefs.getString(key.name) ?? '';
+  }
+
+  Future<String?> setStringValue(mySharedKey key, String? value) async {
     SharedPreferences myPrefs = await SharedPreferences.getInstance();
     return myPrefs.getString(key.name) ?? '';
   }

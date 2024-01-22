@@ -62,11 +62,8 @@ class LoginFormProvider extends ChangeNotifier {
     try {
       var response = await _networkManager.loginUser(
           username: _username, password: _password);
-      print("response: $response  ");
-      print("response: $response  ");
       if (response != null) {
         if (response.state == true) {
-          print("state: ${response.state}  ");
           // user login data
           await MySharedPreferences.instance
               .setLoggedInUserData(response.data?.first);

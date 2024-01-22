@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kartal/kartal.dart';
 import 'package:tk_photo/product/constant/app_menu_list.dart';
 import 'package:tk_photo/service/shared_preferences.dart';
-
 import '../../core/model/general_list_model.dart';
-import '../main/main_provider.dart';
 import '../settings/save_ratio.dart';
 import 'home_provider.dart';
 
@@ -74,7 +71,7 @@ class _HomePageViewState extends ConsumerState<HomePageView> {
                 const SizedBox(height: 10),
                 buildWarehouseDropbox(),
                 const SizedBox(height: 10),
-                SwitchListTile(
+                /* SwitchListTile(
                   title: const Text('Fotoğraf Yükleme Modu'),
                   value: ref.watch(mainProvider).isPhotoUploadMode,
                   onChanged: (value) async {
@@ -83,7 +80,7 @@ class _HomePageViewState extends ConsumerState<HomePageView> {
                     ref.read(mainProvider).changePhotoUploadMode();
                     EasyLoading.dismiss();
                   },
-                ),
+                ), */
               ],
             ),
           ),
@@ -93,7 +90,7 @@ class _HomePageViewState extends ConsumerState<HomePageView> {
   DropdownButtonFormField<Object?> buildWarehouseDropbox() {
     return DropdownButtonFormField(
       onChanged: (value) {
-        //  ref.read(homeProvider.notifier).setWarehouseList(value.toString());
+        ref.read(homeProvider.notifier).setWarehouseList(value.toString());
       },
       value: ref
           .watch(homeProvider)
@@ -116,7 +113,7 @@ class _HomePageViewState extends ConsumerState<HomePageView> {
   DropdownButtonFormField<Object?> buildPriceDropbox() {
     return DropdownButtonFormField(
       onChanged: (value) {
-        //ref.read(homeProvider.notifier).setPriceList(value.toString());
+        ref.read(homeProvider.notifier).setPriceList(value.toString());
       },
       value: ref
           .watch(homeProvider)

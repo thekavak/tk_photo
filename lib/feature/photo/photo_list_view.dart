@@ -28,6 +28,14 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
 
   bool? isCreating = false;
 
+  String _currentLanguage = 'tr';
+  final Map<String, dynamic> _translations = {
+    'en': {'stock': 'Stock', 'piece': 'Piece'},
+    'tr': {'stock': 'Stok', 'piece': 'Adet'},
+    'de': {'stock': 'Lager', 'piece': 'Stück'},
+    'ru': {'stock': 'Склад', 'piece': 'Кусок'},
+  };
+
   @override
   void initState() {
     super.initState();
@@ -41,22 +49,77 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
     }
   }
 
+  void _showLanguageDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Dil Seçin'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                GestureDetector(
+                  child: const Text('Türkçe'),
+                  onTap: () => _changeLanguage('tr'),
+                ),
+                const Padding(padding: EdgeInsets.all(8.0)),
+                GestureDetector(
+                  child: const Text('English'),
+                  onTap: () => _changeLanguage('en'),
+                ),
+                const Padding(padding: EdgeInsets.all(8.0)),
+                GestureDetector(
+                  child: const Text('Deutsch'),
+                  onTap: () => _changeLanguage('de'),
+                ),
+                const Padding(padding: EdgeInsets.all(8.0)),
+                GestureDetector(
+                  child: const Text('Русский'),
+                  onTap: () => _changeLanguage('ru'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _changeLanguage(String languageCode) {
+    Navigator.of(context).pop(); // Diyalogu kapat
+    EasyLoading.show(status: 'Dil Değiştiriliyor...');
+    Future.delayed(const Duration(seconds: 1), () {
+      setState(() {
+        _currentLanguage = languageCode;
+      });
+      EasyLoading.dismiss();
+      EasyLoading.showToast('Dil Değiştirildi: $languageCode');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var state = ref.watch(productPhotoProvider);
     double width = MediaQuery.of(context).size.width; // Ekranın genişliğini al
     double height =
         width / state.aspectRatio!; // Yüksekliği hesaplaÖrneğin ekranın %60'ı
-    print(state.aspectRatio!);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Önizleme', style: TextStyle(color: Colors.white)),
+        actions: [
+          IconButton(
+            onPressed: () {
+              _showLanguageDialog();
+            },
+            icon: const Icon(Icons.language),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             SizedBox(
-              height: height,
+              height: (state.addVariants == true) ? height + 80 : height,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
@@ -87,64 +150,217 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
           const EdgeInsets.only(left: 16.0, bottom: 16, top: 16, right: 16),
       child: WidgetsToImage(
         controller: controllers[photoList!.indexOf(e)],
-        child: AspectRatio(
-          aspectRatio: state.aspectRatio!,
-          child: InkWell(
-            onDoubleTap: () async {
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => PhotoEditView(
-                            item: e,
-                          )));
-              setState(() {});
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  onError: (error, stackTrace) =>
-                      const Center(child: Text('Resim Yüklenemedi')),
-                  image: NetworkImage(
-                    e.colors?[e.currentIndex!].colorImage ?? '',
-                    scale: 1,
+        child: Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(0),
+              border:
+                  Border.all(color: Colors.grey.withOpacity(0.3), width: 1)),
+          child: Column(
+            children: [
+              Expanded(
+                child: AspectRatio(
+                  aspectRatio: state.aspectRatio!,
+                  child: InkWell(
+                    onDoubleTap: () async {
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PhotoEditView(
+                                    item: e,
+                                  )));
+                      setState(() {});
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          onError: (error, stackTrace) =>
+                              const Center(child: Text('Resim Yüklenemedi')),
+                          image: NetworkImage(
+                            e.colors?[e.currentIndex!].colorImage ?? '',
+                            scale: 1,
+                          ),
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              (e.package != null && e.package!.isNotEmpty)
+                                  ? Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                          alignment: Alignment.center,
+                                          decoration: const BoxDecoration(
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      'assets/images/pngegg.png'))),
+                                          height: 40,
+                                          width: 40,
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 8.0),
+                                            child: Text(e.package ?? '',
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: (e.package ?? '')
+                                                                .length >=
+                                                            2
+                                                        ? 10
+                                                        : 14)),
+                                          )),
+                                    )
+                                  : Container()
+                            ],
+                          ),
+                          const Spacer(),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 8.0),
+                                        child: SizedBox(
+                                          child: Text(
+                                            "#${e.itemCode}",
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                                color: Colors.black54,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 8.0),
+                                        child: SizedBox(
+                                          child: Text(
+                                            "${e.basePrice} ${e.basePriceCurrencyCode} / ${_translations[_currentLanguage]?['piece']}",
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                                color: Colors.black54,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 8.0),
+                                        child: SizedBox(
+                                          child: Text(
+                                            "${e.itemDescription}",
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                                color: Colors.black54,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 8.0),
+                                        child: SizedBox(
+                                          child: Text(
+                                            "${_translations[_currentLanguage]?['stock']}: ${e.colors?[e.currentIndex!].stock}",
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                                color: Colors.black54,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+
+                          //buildInformationBant(e.currentIndex!, state),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      state.addVariants == true
-                          ? addVariants(e.currentIndex!, state)
-                          : Container(),
-                      state.showLogo == true
-                          ? Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: SizedBox(
-                                width: 80,
-                                child: Image.network(
-                                  state.companyLogo ?? '',
-                                  loadingBuilder: (context, child,
-                                          loadingProgress) =>
-                                      loadingProgress == null
-                                          ? child
-                                          : const CircularProgressIndicator(),
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container();
-                                  },
-                                ),
-                              ))
-                          : Container()
-                    ],
-                  ),
-                  const Spacer(),
-                  buildInformationBant(e.currentIndex!, state),
-                ],
+              state.addVariants == true
+                  ? addVariants(photoList!.indexOf(e), state)
+                  : Container(),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                height: 1,
+                color: Colors.grey.withOpacity(0.3),
               ),
-            ),
+              /* SizedBox(
+                height: 30,
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          state.showStock == true
+                              ? '${photoList![photoList!.indexOf(e)].basePrice} ${photoList![photoList!.indexOf(e)].basePriceCurrencyCode} / ${_translations[_currentLanguage]?['piece']}'
+                              : '',
+                          style: const TextStyle(
+                              color: Colors.black54,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700),
+                        ),
+                        Text(
+                          state.showStock == true
+                              ? 'Stock: ${photoList![photoList!.indexOf(e)].colors?[photoList![photoList!.indexOf(e)].currentIndex!].stock}'
+                              : '',
+                          style: const TextStyle(
+                              color: Colors.black54,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              )*/
+            ],
           ),
         ),
       ),
@@ -258,7 +474,7 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
               ),
             ],
           ),
-          /* Row(
+          /*Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('Seçilen Ürün Stok Göster',
@@ -277,7 +493,7 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
                 activeColor: Colors.white,
               ),
             ],
-          ), */
+          ),*/
         ],
       ),
     );
@@ -338,253 +554,56 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
     );
   }
 
-  Widget buildProduct(PhotoPageState state) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: List.generate(
-          widget.photoList?.length ?? 0,
-          (index) => Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: AspectRatio(
-                aspectRatio: state.aspectRatio!,
-                child: Container(
-                    height: MediaQuery.of(context).size.height * 0.6,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: NetworkImage(
-                          photoList![state.currentIndex!]
-                                  .colors?[photoList![state.currentIndex!]
-                                      .currentIndex!]
-                                  .colorImage ??
-                              '',
-                        ),
-                        onError: (error, stackTrace) =>
-                            const AssetImage('assets/could_not_load_img.jpg'),
-                      ),
-                    ),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              state.addVariants == true
-                                  ? addVariants(state.currentIndex!, state)
-                                  : Container(),
-                              state.showLogo == true
-                                  ? Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: SizedBox(
-                                        width: 80,
-                                        child: Image.network(
-                                          state.companyLogo ?? '',
-                                          loadingBuilder: (context, child,
-                                                  loadingProgress) =>
-                                              loadingProgress == null
-                                                  ? child
-                                                  : const CircularProgressIndicator(),
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return IconButton(
-                                                onPressed: () {},
-                                                icon: const Icon(Icons
-                                                    .upload_file_outlined));
-                                          },
-                                        ),
-                                      ))
-                                  : Container()
-                            ],
-                          ),
-                          const Spacer(),
-                          buildInformationBant(state.currentIndex!, state),
-                        ],
-                      ),
-                    ))),
-          ), /*  Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: Center(
-              child: WidgetsToImage(
-                controller: controllers[index],
-                child: AspectRatio(
-                  aspectRatio: state.aspectRatio!,
-                  child: InkWell(
-                    onDoubleTap: () async {
-                      await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PhotoEditView(
-                                    item: photoList![index],
-                                  )));
-                      setState(() {});
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          fit: BoxFit.contain,
-                          image: NetworkImage(
-                            photoList![index]
-                                    .colors?[photoList![index].currentIndex!]
-                                    .colorImage ??
-                                '',
-                          ),
-                          onError: (error, stackTrace) =>
-                              const AssetImage('assets/could_not_load_img.jpg'),
-                        ),
-                      ),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                state.addVariants == true
-                                    ? addVariants(index, state)
-                                    : Container(),
-                                state.showLogo == true
-                                    ? Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: SizedBox(
-                                          width: 80,
-                                          child: Image.network(
-                                            state.companyLogo ?? '',
-                                            loadingBuilder: (context, child,
-                                                    loadingProgress) =>
-                                                loadingProgress == null
-                                                    ? child
-                                                    : const CircularProgressIndicator(),
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                              return Container();
-                                            },
-                                          ),
-                                        ),
-                                      )
-                                    : Container()
-                              ],
-                            ),
-                            const Spacer(),
-                            buildInformationBant(index, state),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),*/
-        ),
-      ),
-    );
-  }
-
-  Widget buildProduct2(PhotoPageState state) {
-    double calculatedWidth =
-        MediaQuery.of(context).size.height * 0.6 * state.aspectRatio!;
-
+  SizedBox addVariants(int index, PhotoPageState state) {
     return SizedBox(
-      width: calculatedWidth,
-      height: MediaQuery.of(context).size.height * 0.6,
-      child: ListView.builder(
-        controller: _scrollController,
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.only(
-              left: 8,
-            ),
-            child: Center(
-              child: WidgetsToImage(
-                controller: controllers[index],
-                child: AspectRatio(
-                  aspectRatio: 4 / 5,
-                  child: InkWell(
-                    onDoubleTap: () async {
-                      await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PhotoEditView(
-                                    item: photoList![index],
-                                  )));
-                      setState(() {});
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
+      child: Row(
+        children: photoList![index]
+            .colors!
+            .where((element) =>
+                element !=
+                    photoList![index]
+                        .colors![photoList![index].currentIndex!] &&
+                element.colorImage.isNotNullOrNoEmpty)
+            .map((e) => Padding(
+                padding:
+                    const EdgeInsets.only(left: 2, right: 2, top: 4, bottom: 4),
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      photoList![index].currentIndex =
+                          photoList![index].colors!.indexOf(e);
+                    });
+                  },
+                  child: Container(
+                      width: 80,
+                      height: 80,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          fit: BoxFit.fitWidth,
-                          image: NetworkImage(photoList![index]
-                                  .colors?[photoList![index].currentIndex!]
-                                  .colorImage ??
-                              ''),
-                          onError: (error, stackTrace) =>
-                              const AssetImage('assets/could_not_load_img.jpg'),
-                        ),
+                            fit: BoxFit.cover,
+                            image: NetworkImage(e.colorImage ?? '')),
+                        color: Colors.white,
                       ),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                state.addVariants == true
-                                    ? addVariants(index, state)
-                                    : Container(),
-                                state.showLogo == true
-                                    ? Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: SizedBox(
-                                          width: 80,
-                                          child: Image.network(
-                                            state.companyLogo ?? '',
-                                            loadingBuilder: (context, child,
-                                                    loadingProgress) =>
-                                                loadingProgress == null
-                                                    ? child
-                                                    : const CircularProgressIndicator(),
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                              return IconButton(
-                                                  onPressed: () {},
-                                                  icon: const Icon(Icons
-                                                      .upload_file_outlined));
-                                            },
-                                          ),
-                                        ))
-                                    : Container()
-                              ],
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            state.showStock == true
+                                ? '#${photoList![index].itemCode}\n${e.colorDescription} - ${e.stock}'
+                                : '',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 10,
+                              color: Colors.black,
                             ),
-                            const Spacer(),
-                            buildInformationBant(index, state),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-        itemCount: widget.photoList?.length ?? 0,
+                          ),
+                        ],
+                      )),
+                )))
+            .toList(),
       ),
     );
-  }
-
-  Column addVariants(int index, PhotoPageState state) {
-    return Column(
+    /* return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: photoList![index]
@@ -620,46 +639,21 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
               )))
           .toList(),
     );
+    */
   }
 
-  Container buildInformationBant(int index, PhotoPageState state) {
-    return Container(
+  SizedBox buildInformationBant(int index, PhotoPageState state) {
+    return SizedBox(
       height: 60,
-      color: Colors.grey.withOpacity(0.2),
+      width: MediaQuery.of(context).size.width,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  child: Text("#${widget.photoList![index].itemCode}",
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold)),
-                ),
-                SizedBox(
-                  child: Text(
-                    photoList![index].itemDescription ?? '',
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                )
-              ],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                buildShowStock(index, state),
-                buildShowPrice(index, state),
-              ],
-            )
+            buildShowStock(index, state),
+            buildShowPrice(index, state),
           ],
         ),
       ),
@@ -688,14 +682,5 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
     } else {
       return const Text("");
     }
-  }
-
-  Widget buildLoading(PhotoPageState state) {
-    /*if (state.appState == ApppProcessStatus.loading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    } */
-    return buildProduct(state);
   }
 }

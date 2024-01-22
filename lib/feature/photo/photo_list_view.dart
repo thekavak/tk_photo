@@ -327,39 +327,6 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
                 height: 1,
                 color: Colors.grey.withOpacity(0.3),
               ),
-              /* SizedBox(
-                height: 30,
-                width: MediaQuery.of(context).size.width * 0.8,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          state.showStock == true
-                              ? '${photoList![photoList!.indexOf(e)].basePrice} ${photoList![photoList!.indexOf(e)].basePriceCurrencyCode} / ${_translations[_currentLanguage]?['piece']}'
-                              : '',
-                          style: const TextStyle(
-                              color: Colors.black54,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700),
-                        ),
-                        Text(
-                          state.showStock == true
-                              ? 'Stock: ${photoList![photoList!.indexOf(e)].colors?[photoList![photoList!.indexOf(e)].currentIndex!].stock}'
-                              : '',
-                          style: const TextStyle(
-                              color: Colors.black54,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              )*/
             ],
           ),
         ),

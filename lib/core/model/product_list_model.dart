@@ -22,8 +22,13 @@ class ProductListModel {
       this.colors});
 
   ProductListModel.fromJson(Map<String, dynamic> json) {
-    itemCode = json['ItemCode'];
-    itemDescription = json['ItemDescription'];
+    itemCode = json['ItemCode'] != null && json['ItemCode'].length > 20
+        ? json['ItemCode'].substring(0, 20)
+        : json['ItemCode'];
+    itemDescription =
+        json['ItemDescription'] != null && json['ItemDescription'].length > 34
+            ? json['ItemDescription'].substring(0, 34)
+            : json['ItemDescription'];
     basePrice = json['BasePrice'];
     basePriceCurrencyCode = json['BasePriceCurrencyCode'];
     tRYPrice = json['TRYPrice'];
@@ -72,9 +77,12 @@ class ColorsList {
 
   ColorsList.fromJson(Map<String, dynamic> json) {
     colorCode = json['ColorCode'];
-    colorDescription = json['ColorDescription'];
+    colorDescription =
+        json['ColorDescription'] != null && json['ColorDescription'].length > 9
+            ? json['ColorDescription'].substring(0, 9)
+            : json['ColorDescription'];
     colorImage = json['ColorImage'];
-    stock = json['Stock'];
+    stock = json['Stock'] != null && json['Stock'] > 500 ? -1 : json['Stock'];
     isSelected = false;
   }
 

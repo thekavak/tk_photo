@@ -32,7 +32,7 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
   final Map<String, dynamic> _translations = {
     'en': {'stock': 'Stock', 'piece': 'Piece'},
     'tr': {'stock': 'Stok', 'piece': 'Adet'},
-    'de': {'stock': 'Lager', 'piece': 'Stück'},
+    'de': {'stock': 'Inventur', 'piece': 'Stück'},
     'ru': {'stock': 'Склад', 'piece': 'Кусок'},
   };
 
@@ -252,15 +252,19 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
                                         padding:
                                             const EdgeInsets.only(right: 8.0),
                                         child: SizedBox(
-                                          child: Text(
-                                            "${e.basePrice} ${e.basePriceCurrencyCode} / ${_translations[_currentLanguage]?['piece']}",
+                                            child: buildShowPrice(
+                                                photoList!.indexOf(e),
+                                                state) /* Text(
+                                            state.showPrice == true
+                                                ? "${e.basePrice} ${e.basePriceCurrencyCode} / ${_translations[_currentLanguage]?['piece']}"
+                                                : "",
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
                                                 color: Colors.black54,
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w700),
-                                          ),
-                                        ),
+                                          ),*/
+                                            ),
                                       ),
                                     ],
                                   ),
@@ -295,15 +299,17 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
                                         padding:
                                             const EdgeInsets.only(right: 8.0),
                                         child: SizedBox(
-                                          child: Text(
+                                            child: buildShowStock(
+                                                photoList!.indexOf(e), state)
+                                            /*Text(
                                             "${_translations[_currentLanguage]?['stock']}: ${e.colors?[e.currentIndex!].stock}",
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
                                                 color: Colors.black54,
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w700),
-                                          ),
-                                        ),
+                                          ),*/
+                                            ),
                                       ),
                                     ],
                                   ),
@@ -359,7 +365,7 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
               ),
             ],
           ),
-          Row(
+          /* Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('Logo',
@@ -378,7 +384,7 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
                 activeColor: Colors.white,
               ),
             ],
-          ),
+          ),*/
           const Divider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -531,82 +537,60 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
                     photoList![index]
                         .colors![photoList![index].currentIndex!] &&
                 element.colorImage.isNotNullOrNoEmpty)
-            .map((e) => Padding(
-                padding:
-                    const EdgeInsets.only(left: 2, right: 2, top: 4, bottom: 4),
-                child: InkWell(
-                  onTap: () {
-                    setState(() {
-                      photoList![index].currentIndex =
-                          photoList![index].colors!.indexOf(e);
-                    });
-                  },
-                  child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: NetworkImage(e.colorImage ?? '')),
-                        color: Colors.white,
+            .map((e) => Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top: 4.0, bottom: 2.0, right: 2.0, left: 2.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                color: Colors.grey.withOpacity(0.3), width: 1)),
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              photoList![index].currentIndex =
+                                  photoList![index].colors!.indexOf(e);
+                            });
+                          },
+                          child: Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  onError: (exception, stackTrace) {
+                                    const Center(
+                                        child: Text('Resim Yüklenemedi'));
+                                  },
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                    e.colorImage ?? '',
+                                  ),
+                                ),
+                                color: Colors.white,
+                              ),
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [],
+                              )),
+                        ),
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            state.showStock == true
-                                ? '#${photoList![index].itemCode}\n${e.colorDescription} - ${e.stock}'
-                                : '',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 10,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      )),
-                )))
+                    ),
+                    Text(
+                        state.showStock == true
+                            ? '${e.colorDescription} - ${e.stock == -1 ? '10+' : e.stock}'
+                            : '',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            color: Colors.black54,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700))
+                  ],
+                ))
             .toList(),
       ),
     );
-    /* return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: photoList![index]
-          .colors!
-          .where((element) =>
-              element !=
-                  photoList![index].colors![photoList![index].currentIndex!] &&
-              element.colorImage.isNotNullOrNoEmpty)
-          .map((e) => Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    photoList![index].currentIndex =
-                        photoList![index].colors!.indexOf(e);
-                  });
-                },
-                child: Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: NetworkImage(e.colorImage ?? '')),
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Text(
-                      state.showStock == true ? '${e.stock}' : '',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: ColorConstants.mtPrimary),
-                    )),
-              )))
-          .toList(),
-    );
-    */
   }
 
   SizedBox buildInformationBant(int index, PhotoPageState state) {
@@ -630,11 +614,17 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
   Text buildShowPrice(int index, PhotoPageState state) {
     if (state.showPrice == true && state.showBasePrice == false) {
       return Text(
-        '${widget.photoList![index].basePrice} ${widget.photoList![index].basePriceCurrencyCode}',
+        '${widget.photoList![index].basePrice} ${widget.photoList![index].basePriceCurrencyCode} / ${_translations[_currentLanguage]?['piece']}',
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(
+            color: Colors.black54, fontSize: 12, fontWeight: FontWeight.w700),
       );
     } else if (state.showPrice == true && state.showBasePrice == true) {
       return Text(
-        '${widget.photoList![index].tRYPrice} TRY',
+        '${widget.photoList![index].tRYPrice} TRY / ${_translations[_currentLanguage]?['piece']}',
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(
+            color: Colors.black54, fontSize: 12, fontWeight: FontWeight.w700),
       );
     }
     return const Text("");
@@ -643,9 +633,12 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
   Text buildShowStock(int index, PhotoPageState state) {
     if (state.showStock == true) {
       return Text(
-          "Stok ${widget.photoList![index].colors?[photoList![index].currentIndex!].stock}",
+          "Stok ${widget.photoList![index].colors?[photoList![index].currentIndex!].stock == -1 ? '10+' : widget.photoList![index].colors?[photoList![index].currentIndex!].stock}",
+          overflow: TextOverflow.ellipsis,
           style: const TextStyle(
-              color: Colors.black, fontSize: 13, fontWeight: FontWeight.bold));
+              color: Colors.black54,
+              fontSize: 12,
+              fontWeight: FontWeight.w700));
     } else {
       return const Text("");
     }

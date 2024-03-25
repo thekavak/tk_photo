@@ -64,12 +64,15 @@ class AppTheme {
         ),
         appBarTheme: const AppBarTheme(
           elevation: 0,
+          scrolledUnderElevation: 0,
           iconTheme: IconThemeData(color: Colors.white),
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: ColorConstants.mtPrimary,
         ),
         scaffoldBackgroundColor: Colors.white,
         switchTheme: SwitchThemeData(
-          thumbColor: MaterialStateProperty.all(Colors.white),
-          overlayColor: MaterialStateProperty.all(
+          thumbColor: WidgetStateProperty.all(Colors.white),
+          overlayColor: WidgetStateProperty.all(
             ColorConstants.mtPrimary.withOpacity(0.2),
           ),
         ),
@@ -94,14 +97,13 @@ class AppTheme {
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
-            padding: MaterialStateProperty.all(const EdgeInsets.all(6)),
-            elevation: MaterialStateProperty.all(0),
-            overlayColor:
-                MaterialStateProperty.all(Colors.grey.withOpacity(0.2)),
-            backgroundColor: MaterialStateProperty.all(
+            padding: WidgetStateProperty.all(const EdgeInsets.all(6)),
+            elevation: WidgetStateProperty.all(0),
+            overlayColor: WidgetStateProperty.all(Colors.grey.withOpacity(0.2)),
+            backgroundColor: WidgetStateProperty.all(
               ColorConstants.mtPrimary,
             ),
-            shape: MaterialStateProperty.all(
+            shape: WidgetStateProperty.all(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -119,14 +121,14 @@ class AppTheme {
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: ButtonStyle(
             overlayColor:
-                MaterialStateProperty.all(Colors.white.withOpacity(0.2)),
-            shape: MaterialStateProperty.all(
+                WidgetStateProperty.all(Colors.white.withOpacity(0.2)),
+            shape: WidgetStateProperty.all(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
           ),
         ),
-        useMaterial3: true,
+        // useMaterial3: true,
       );
 }

@@ -71,8 +71,8 @@ class AppTheme {
         ),
         scaffoldBackgroundColor: Colors.white,
         switchTheme: SwitchThemeData(
-          thumbColor: WidgetStateProperty.all(Colors.white),
-          overlayColor: WidgetStateProperty.all(
+          thumbColor: MaterialStateProperty.all(Colors.white),
+          overlayColor: MaterialStateProperty.all(
             ColorConstants.mtPrimary.withOpacity(0.2),
           ),
         ),
@@ -97,13 +97,14 @@ class AppTheme {
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
-            padding: WidgetStateProperty.all(const EdgeInsets.all(6)),
-            elevation: WidgetStateProperty.all(0),
-            overlayColor: WidgetStateProperty.all(Colors.grey.withOpacity(0.2)),
-            backgroundColor: WidgetStateProperty.all(
+            padding: MaterialStateProperty.all(const EdgeInsets.all(6)),
+            elevation: MaterialStateProperty.all(0),
+            overlayColor:
+                MaterialStateProperty.all(Colors.grey.withOpacity(0.2)),
+            backgroundColor: MaterialStateProperty.all(
               ColorConstants.mtPrimary,
             ),
-            shape: WidgetStateProperty.all(
+            shape: MaterialStateProperty.all(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -121,8 +122,8 @@ class AppTheme {
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: ButtonStyle(
             overlayColor:
-                WidgetStateProperty.all(Colors.white.withOpacity(0.2)),
-            shape: WidgetStateProperty.all(
+                MaterialStateProperty.all(Colors.white.withOpacity(0.2)),
+            shape: MaterialStateProperty.all(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),

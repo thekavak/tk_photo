@@ -1,15 +1,14 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=/Users/mac/development/flutter
-FLUTTER_APPLICATION_PATH=/Users/mac/tk_photo
+FLUTTER_ROOT=/Users/thekavak/development/flutter
+FLUTTER_APPLICATION_PATH=/Users/thekavak/tk_photo
 COCOAPODS_PARALLEL_CODE_SIGN=true
-FLUTTER_TARGET=/Users/mac/tk_photo/lib/main.dart
+FLUTTER_TARGET=lib/main.dart
 FLUTTER_BUILD_DIR=build
 FLUTTER_BUILD_NAME=1.0.0
 FLUTTER_BUILD_NUMBER=1
 EXCLUDED_ARCHS[sdk=iphonesimulator*]=i386
 EXCLUDED_ARCHS[sdk=iphoneos*]=armv7
-DART_DEFINES=RkxVVFRFUl9XRUJfQ0FOVkFTS0lUX1VSTD1odHRwczovL3d3dy5nc3RhdGljLmNvbS9mbHV0dGVyLWNhbnZhc2tpdC9kMWZlODk5NGRlZGY4MzdmOTQ0ZTczOWNkMDMwNTA4MTE4YmU5NGNkLw==
 DART_OBFUSCATION=false
 TRACK_WIDGET_CREATION=true
 TREE_SHAKE_ICONS=false
-PACKAGE_CONFIG=/Users/mac/tk_photo/.dart_tool/package_config.json
+PACKAGE_CONFIG=.dart_tool/package_config.json

@@ -31,6 +31,8 @@ enum mySharedKey {
   TKP_GLOBAL_FILTER_ATTRIBUTES,
   // ignore: constant_identifier_names
   TKP_ASPECT_RATIO,
+  // ignore: constant_identifier_names
+  TKP_GLOBAL_FILTER_STOCK_LIMIT,
 }
 
 class MySharedPreferences {
@@ -40,7 +42,7 @@ class MySharedPreferences {
       MySharedPreferences._privateConstructor();
 
   Future<void> setLoggedInUserData(LoginModelData? user) async {
-    print(user?.toJson());
+    //print(user?.toJson());
     final prefs = await SharedPreferences.getInstance();
     prefs.clear();
     String? encodedData = user == null ? "" : jsonEncode(user.toJson());
@@ -63,7 +65,7 @@ class MySharedPreferences {
       List<GeneralListType>? data, mySharedKey key) async {
     SharedPreferences myPrefs = await SharedPreferences.getInstance();
     String? encodedData = data == null ? "" : jsonEncode(data);
-    print(encodedData);
+    //print(encodedData);
     await myPrefs.setString(key.name, encodedData);
   }
 
@@ -77,7 +79,7 @@ class MySharedPreferences {
   Future<List<GeneralListType>?> getGlobalFilterModel(mySharedKey key) async {
     SharedPreferences myPrefs = await SharedPreferences.getInstance();
     String? encodedData = myPrefs.getString(key.name);
-    print(encodedData);
+    //print(encodedData);
     if (encodedData != null && encodedData.isNotEmpty) {
       List<dynamic> decodedData = jsonDecode(encodedData);
       List<GeneralListType> data = decodedData
@@ -108,9 +110,9 @@ class MySharedPreferences {
     return myPrefs.getString(key.name) ?? '';
   }
 
-  Future<String?> setStringValue(mySharedKey key, String? value) async {
+  Future<bool?> setStringValue(mySharedKey key, String value) async {
     SharedPreferences myPrefs = await SharedPreferences.getInstance();
-    return myPrefs.getString(key.name) ?? '';
+    return myPrefs.setString(key.name, value);
   }
 
   Future<bool?> getBoolValue(mySharedKey key) async {

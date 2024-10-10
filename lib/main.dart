@@ -16,7 +16,7 @@ void main() async {
   username = await MySharedPreferences.instance
       .getStringValue(mySharedKey.TKP_USER_NAME);
   if (kDebugMode) {
-    print(username);
+    //print(username);
   }
   runApp(const ProviderScope(child: MyApp()));
   configLoading();
@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
         ),
         duration: const Duration(milliseconds: 1500),
         animationDuration: const Duration(milliseconds: 1000),
-        onAnimationEnd: () => debugPrint("On Scale End"),
+        // onAnimationEnd: () =>
         nextScreen: (username != null && (username?.isNotEmpty ?? false))
             ? const HomePageView()
             : const LoginView(),

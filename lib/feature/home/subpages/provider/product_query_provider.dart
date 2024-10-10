@@ -88,7 +88,7 @@ class ProductQueryNotifier extends StateNotifier<ProductQueryState> {
         ),
       );
     }
-    print("çıktı");
+    //print("çıktı");
   }
 
   Future<void> scanBarcodeNormal(BuildContext context) async {

@@ -69,10 +69,10 @@ class LoginFormProvider extends ChangeNotifier {
               .setLoggedInUserData(response.data?.first);
 
           var parameters = await getParameters();
-          print(parameters);
+          //print(parameters);
           if (parameters != null) {
             // price lists
-            print(parameters.prices.toString());
+            //print(parameters.prices.toString());
             await MySharedPreferences.instance.setGlobalFilterModel(
                 parameters.prices, mySharedKey.TKP_GLOBAL_FILTER_PRICE_LIST);
             // warehouses
@@ -94,7 +94,7 @@ class LoginFormProvider extends ChangeNotifier {
         return AppApiStatusModel(message: response.message, result: false);
       }
     } catch (e) {
-      print(e);
+      //print(e);
       return AppApiStatusModel(
           message: "Daha sonra tekrar deneyiniz #101.", result: false);
     }

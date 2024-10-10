@@ -47,17 +47,17 @@ class _ImageUploadViewState extends ConsumerState<ImageUploadView> {
 
   imageUploadApi(UploadedFile choosenFilePath) async {
     try {
-      print("imageUploadApi");
+      //print("imageUploadApi");
       File file = File(choosenFilePath.path);
       String fileName = choosenFilePath.name;
-      print(fileName);
+      //print(fileName);
       var formData = FormData.fromMap({
         "file": await MultipartFile.fromFile(file.path, filename: fileName),
       });
 
       var response = await _request.uploadProductImage(formData: formData);
-      print("response message${response?.message}");
-      print(response?.url);
+      //print("response message${response?.message}");
+      //print(response?.url);
       if (response == null) {
         _logException('Dosya yüklenemedi');
         return;
@@ -77,7 +77,7 @@ class _ImageUploadViewState extends ConsumerState<ImageUploadView> {
         });
       }
     } catch (e) {
-      print(e);
+      //print(e);
     }
   }
 

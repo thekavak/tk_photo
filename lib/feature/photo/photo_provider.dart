@@ -40,7 +40,7 @@ class ProductPhotoProvider extends StateNotifier<PhotoPageState> {
 
   changeIndex(int index) {
     state = state.copyWith(currentIndex: index);
-    print("index$index");
+    //print("index$index");
   }
 
   changeStatus(AppPropertiesEnum property, bool value) {

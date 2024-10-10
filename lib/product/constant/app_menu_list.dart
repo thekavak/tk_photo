@@ -22,11 +22,11 @@ class AppMenuList {
       'id': 3,
       'type': AppMenu.category
     },
-    {
+    /* {
       'icon': Icons.settings,
       'title': 'Son Eklenenler',
       'id': 4,
       'type': AppMenu.lastAdded
-    },
+    },*/
   ];
 }

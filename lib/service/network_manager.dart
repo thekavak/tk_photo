@@ -62,7 +62,7 @@ class NetworkManager {
       }
     } catch (e) {
       if (kDebugMode) {
-        print(e);
+        //print(e);
       }
       rethrow;
     }
@@ -84,7 +84,7 @@ class NetworkManager {
       return loginModel;
     } catch (e) {
       if (kDebugMode) {
-        print(e);
+        //print(e);
       }
 
       rethrow;
@@ -116,7 +116,7 @@ class NetworkManager {
         throw Exception("Servis adresi bulunamadı");
       }
     } catch (e) {
-      print("Hata: $e");
+      //print("Hata: $e");
 
       rethrow;
     }
@@ -154,11 +154,20 @@ class NetworkManager {
               .code
           : warehouseList.first.code;
 
+      var stockLimit = await MySharedPreferences.instance
+              .getStringValue(mySharedKey.TKP_GLOBAL_FILTER_STOCK_LIMIT) ??
+          '0';
+
       _dio.options.queryParameters.addAll(
           {'username': username, 'method': GetApiMethod.productQuery.method});
 
-      _dio.options.queryParameters
-          .addAll({'priceCode': price, 'warehouseCode': warehouse});
+      _dio.options.queryParameters.addAll({
+        'priceCode': price,
+        'warehouseCode': warehouse,
+        'stockLimit': stockLimit
+      });
+
+      //print(_dio.options.queryParameters);
 
       if (serviceUrl != null && serviceUrl.isNotEmpty) {
         final response = await _dio.get(
@@ -168,6 +177,7 @@ class NetworkManager {
         );
         if (kDebugMode) {
           print(response.realUri);
+          print(response);
         }
 
         if (response.statusCode == 200) {
@@ -182,7 +192,7 @@ class NetworkManager {
       }
     } catch (e) {
       if (kDebugMode) {
-        print(e);
+        //print(e);
       }
 
       rethrow;

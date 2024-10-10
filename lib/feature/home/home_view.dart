@@ -27,6 +27,9 @@ class _HomePageViewState extends ConsumerState<HomePageView> {
   Widget build(BuildContext context) {
     //Menu listesi
     final menuList = AppMenuList().menuList;
+
+    //print("Stok Eşiği: ${ref.watch(homeProvider).stockLimitController.text}");
+
     return Scaffold(
         appBar: AppBar(
           title: const Text('TK Photo',
@@ -71,6 +74,26 @@ class _HomePageViewState extends ConsumerState<HomePageView> {
                 const SizedBox(height: 10),
                 buildWarehouseDropbox(),
                 const SizedBox(height: 10),
+                Text('Stok Eşiği', style: context.textTheme.labelMedium),
+                const SizedBox(height: 10),
+                TextFormField(
+                  textAlign: TextAlign.end,
+                  controller: ref.watch(homeProvider).stockLimitController,
+                  onChanged: (value) {
+                    ref.read(homeProvider.notifier).setStockLimit(value);
+                  },
+                  validator: (value) {
+                    if (int.tryParse(value ?? '') == null) {
+                      return 'Lütfen sayısal bir değer giriniz';
+                    }
+                    return null;
+                  },
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    hintText: 'Stok Eşiği',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
                 /* SwitchListTile(
                   title: const Text('Fotoğraf Yükleme Modu'),
                   value: ref.watch(mainProvider).isPhotoUploadMode,

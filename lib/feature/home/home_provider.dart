@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -29,6 +30,8 @@ class HomePageProvider extends ChangeNotifier {
   List<GeneralListType>? get warehouseList => _warehouseList;
   List<AttributesModel>? get attributesList => _attributesList;
 
+  TextEditingController stockLimitController = TextEditingController(text: '0');
+
   String? _selectedPrice;
   String? _selectedWarehouse;
 
@@ -37,6 +40,17 @@ class HomePageProvider extends ChangeNotifier {
 
   init() async {
     await getGlobalFilterData();
+  }
+
+  setStockLimit(String value) async {
+    stockLimitController.text = value;
+    await MySharedPreferences.instance.setStringValue(
+      mySharedKey.TKP_GLOBAL_FILTER_STOCK_LIMIT,
+      value,
+    );
+
+    await getGlobalFilterData();
+    notifyListeners();
   }
 
   setPriceList(String? code) async {
@@ -101,6 +115,13 @@ class HomePageProvider extends ChangeNotifier {
         _warehouseList.where((element) => element.isSelected == true).isNotEmpty
             ? _warehouseList.where((element) => element.isSelected!).first.code
             : _warehouseList.first.code;
+
+    stockLimitController.text = await MySharedPreferences.instance
+            .getStringValue(mySharedKey.TKP_GLOBAL_FILTER_STOCK_LIMIT) ??
+        '0';
+
+    stockLimitController.text =
+        stockLimitController.text == '' ? '0' : stockLimitController.text;
 
     notifyListeners();
   }

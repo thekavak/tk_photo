@@ -20,7 +20,7 @@ class _ProductMultiSelectState extends ConsumerState<ProductMultiSelect> {
   @override
   Widget build(BuildContext context) {
     var mainController = ref.read(mainProvider);
-    print(mainController.isPhotoUploadMode);
+    //print(mainController.isPhotoUploadMode);
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
@@ -36,7 +36,7 @@ class _ProductMultiSelectState extends ConsumerState<ProductMultiSelect> {
 
                     for (var item in widget.productList!) {
                       if (item.isSelected == true) {
-                        print(item);
+                        //print(item);
                         productListChecked.add(item);
                       }
                     }
@@ -72,7 +72,7 @@ class _ProductMultiSelectState extends ConsumerState<ProductMultiSelect> {
                       checkColor: Colors.white,
                       value: widget.productList![index].isSelected,
                       onChanged: (value) {
-                        print(value);
+                        //print(value);
                         setState(() {
                           widget.productList![index].isSelected = value!;
                         });

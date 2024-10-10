@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kartal/kartal.dart';
@@ -34,6 +36,7 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
     'tr': {'stock': 'Stok', 'piece': 'Adet'},
     'de': {'stock': 'Inventur', 'piece': 'Stück'},
     'ru': {'stock': 'Склад', 'piece': 'Кусок'},
+    'empty': {'stock': 'Stok', 'piece': ''},
   };
 
   @override
@@ -77,6 +80,11 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
                   child: const Text('Русский'),
                   onTap: () => _changeLanguage('ru'),
                 ),
+                const Padding(padding: EdgeInsets.all(8.0)),
+                GestureDetector(
+                  child: const Text('Empty'),
+                  onTap: () => _changeLanguage('empty'),
+                ),
               ],
             ),
           ),
@@ -119,7 +127,7 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
         child: Column(
           children: [
             SizedBox(
-              height: (state.addVariants == true) ? height + 80 : height,
+              //   height: (state.addVariants == true) ? height + 80 : height,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
@@ -145,6 +153,252 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
   }
 
   Padding buildOneImage(PhotoPageState state, ProductListModel e) {
+    // Sabit bir aspect ratio kullanmak istiyorsan, bunu buradan belirtebilirsin
+    var screenWidth = MediaQuery.of(context).size.width - 32;
+
+    var screenHeight = screenWidth *
+        (state.aspectRatio! < 1
+            ? (1 + state.aspectRatio!)
+            : state.aspectRatio!);
+    return Padding(
+      padding:
+          const EdgeInsets.only(left: 16.0, bottom: 16, top: 16, right: 16),
+      child: WidgetsToImage(
+        controller: controllers[photoList!.indexOf(e)],
+        child: Container(
+            color: Colors.grey.shade200,
+            width: screenWidth,
+            height: screenHeight -
+                (state.aspectRatio! == 1 ? -100 : 100) +
+                (state.addVariants == true ? 80 : 0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onDoubleTap: () async {
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PhotoEditView(
+                                    item: e,
+                                  )));
+                      setState(() {});
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          onError: (error, stackTrace) =>
+                              const Center(child: Text('Resim Yüklenemedi')),
+                          image: NetworkImage(
+                            e.colors?[e.currentIndex!].colorImage ?? '',
+                            scale: 1,
+                          ),
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              (e.package != null && e.package!.isNotEmpty)
+                                  ? Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                          alignment: Alignment.center,
+                                          decoration: const BoxDecoration(
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      'assets/images/pngegg.png'))),
+                                          height: 40,
+                                          width: 40,
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 8.0),
+                                            child: Text(e.package ?? '',
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: (e.package ?? '')
+                                                                .length >=
+                                                            2
+                                                        ? 10
+                                                        : 14)),
+                                          )),
+                                    )
+                                  : Container()
+                            ],
+                          ),
+                          const Spacer(),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 12.0,
+                                        ),
+                                        child: SizedBox(
+                                          child: Text(
+                                            "${e.colors?[e.currentIndex!].colorDescription}",
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 12.0, bottom: 8.0),
+                                        child: SizedBox(
+                                          child: Text(
+                                            "#${e.itemCode}",
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            right: 12.0, bottom: 8.0),
+                                        child: SizedBox(
+                                            child: buildShowStock(
+                                                photoList!.indexOf(e), state)),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                state.addVariants == true
+                    ? addVariants(photoList!.indexOf(e), state)
+                    : Container(),
+                SizedBox(
+                  height: state.showStock == true ? 70 : 50,
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width - 150,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 12.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${widget.photoList![photoList!.indexOf(e)].itemDescription}',
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: const TextStyle(
+                                            color: Colors.black87,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700),
+                                      ),
+                                      buildShowPrice(
+                                          photoList!.indexOf(e), state),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              SizedBox(
+                                  height: 50,
+                                  width: 100,
+                                  child: (state.showLogo ?? false)
+                                      ? Image.network(
+                                          state.companyLogo ?? '',
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return const Center(
+                                                child: Text(''));
+                                          },
+                                        )
+                                      : null),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          state.showStock == true
+                              ? SizedBox(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 12.0),
+                                    child: Text(
+                                      widget.photoList![photoList!.indexOf(e)]
+                                              .additionalInfo ??
+                                          '',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox(),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            )),
+      ),
+    );
+  }
+
+  /*Padding buildOneImage(PhotoPageState state, ProductListModel e) {
     return Padding(
       padding:
           const EdgeInsets.only(left: 16.0, bottom: 16, top: 16, right: 16),
@@ -300,16 +554,7 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
                                             const EdgeInsets.only(right: 8.0),
                                         child: SizedBox(
                                             child: buildShowStock(
-                                                photoList!.indexOf(e), state)
-                                            /*Text(
-                                            "${_translations[_currentLanguage]?['stock']}: ${e.colors?[e.currentIndex!].stock}",
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                                color: Colors.black54,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w700),
-                                          ),*/
-                                            ),
+                                                photoList!.indexOf(e), state)),
                                       ),
                                     ],
                                   ),
@@ -317,29 +562,20 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
                               ),
                             ],
                           ),
-
-                          //buildInformationBant(e.currentIndex!, state),
                         ],
                       ),
                     ),
                   ),
                 ),
               ),
-              state.addVariants == true
-                  ? addVariants(photoList!.indexOf(e), state)
-                  : Container(),
-              Container(
-                width: MediaQuery.of(context).size.width * 0.8,
-                height: 1,
-                color: Colors.grey.withOpacity(0.3),
-              ),
+            
             ],
           ),
         ),
       ),
     );
   }
-
+*/
   Padding settings(PhotoPageState state) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -365,7 +601,7 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
               ),
             ],
           ),
-          /* Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('Logo',
@@ -384,7 +620,7 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
                 activeColor: Colors.white,
               ),
             ],
-          ),*/
+          ),
           const Divider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -494,7 +730,7 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
 
       Share.shareXFiles(files);
     } catch (e) {
-      print(e);
+      //print(e);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Oluşturulurken hata oluştu ${e.toString()}')));
     }
@@ -530,6 +766,7 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
   SizedBox addVariants(int index, PhotoPageState state) {
     return SizedBox(
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: photoList![index]
             .colors!
             .where((element) =>
@@ -537,15 +774,17 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
                     photoList![index]
                         .colors![photoList![index].currentIndex!] &&
                 element.colorImage.isNotNullOrNoEmpty)
+            .take(5)
             .map((e) => Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(
                           top: 4.0, bottom: 2.0, right: 2.0, left: 2.0),
                       child: Container(
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                                color: Colors.grey.withOpacity(0.3), width: 1)),
+                        decoration:
+                            BoxDecoration(color: Colors.grey.withOpacity(0.2)),
                         child: InkWell(
                           onTap: () {
                             setState(() {
@@ -553,39 +792,45 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
                                   photoList![index].colors!.indexOf(e);
                             });
                           },
-                          child: Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  onError: (exception, stackTrace) {
-                                    const Center(
-                                        child: Text('Resim Yüklenemedi'));
-                                  },
-                                  fit: BoxFit.cover,
-                                  image: NetworkImage(
-                                    e.colorImage ?? '',
+                          child: Column(
+                            children: [
+                              Container(
+                                  width:
+                                      (MediaQuery.of(context).size.width - 58) /
+                                          5,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      onError: (exception, stackTrace) {
+                                        const Center(
+                                            child: Text('Resim Yüklenemedi'));
+                                      },
+                                      fit: BoxFit.fitWidth,
+                                      image: NetworkImage(
+                                        e.colorImage ?? '',
+                                      ),
+                                    ),
+                                    color: Colors.white,
                                   ),
-                                ),
-                                color: Colors.white,
+                                  child: const Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [],
+                                  )),
+                              Text(
+                                '${e.colorDescription}',
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700),
                               ),
-                              child: const Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [],
-                              )),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                    Text(
-                        state.showStock == true
-                            ? '${e.colorDescription} - ${e.stock == -1 ? '10+' : e.stock}'
-                            : '',
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            color: Colors.black54,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700))
                   ],
                 ))
             .toList(),
@@ -596,7 +841,6 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
   SizedBox buildInformationBant(int index, PhotoPageState state) {
     return SizedBox(
       height: 60,
-      width: MediaQuery.of(context).size.width,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
@@ -613,30 +857,44 @@ class _PhotoListViewState extends ConsumerState<PhotoListView> {
 
   Text buildShowPrice(int index, PhotoPageState state) {
     if (state.showPrice == true && state.showBasePrice == false) {
+      //       // '${widget.photoList![index].itemDescription}\n
+      //${widget.photoList![index].additionalInfo}\n${widget.photoList![index].basePrice}
+      //${widget.photoList![index].basePriceCurrencyCode} / ${_translations[_currentLanguage]?['piece']}',
+
       return Text(
-        '${widget.photoList![index].basePrice} ${widget.photoList![index].basePriceCurrencyCode} / ${_translations[_currentLanguage]?['piece']}',
+        '${widget.photoList![index].basePrice} ${widget.photoList![index].basePriceCurrencyCode} / ${_translations[_currentLanguage]?['piece'] ?? ''}',
         overflow: TextOverflow.ellipsis,
+        maxLines: 1,
         style: const TextStyle(
-            color: Colors.black54, fontSize: 12, fontWeight: FontWeight.w700),
+            color: Colors.black87, fontSize: 12, fontWeight: FontWeight.w700),
       );
     } else if (state.showPrice == true && state.showBasePrice == true) {
+      //        '${widget.photoList![index].itemDescription}\n${widget.photoList![index].additionalInfo}\
+      //n${widget.photoList![index].tRYPrice} TRY / ${_translations[_currentLanguage]?['piece']}',
+
       return Text(
-        '${widget.photoList![index].tRYPrice} TRY / ${_translations[_currentLanguage]?['piece']}',
+        '${widget.photoList![index].tRYPrice} TRY / ${_translations[_currentLanguage]?['piece'] ?? ''}',
         overflow: TextOverflow.ellipsis,
+        maxLines: 1,
         style: const TextStyle(
-            color: Colors.black54, fontSize: 12, fontWeight: FontWeight.w700),
+            color: Colors.black87, fontSize: 12, fontWeight: FontWeight.w700),
       );
     }
-    return const Text("");
+    //${widget.photoList![index].itemDescription}\n${widget.photoList![index].additionalInfo}
+    return const Text('',
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+        style: TextStyle(
+            color: Colors.black87, fontSize: 12, fontWeight: FontWeight.w700));
   }
 
   Text buildShowStock(int index, PhotoPageState state) {
     if (state.showStock == true) {
       return Text(
-          "Stok ${widget.photoList![index].colors?[photoList![index].currentIndex!].stock == -1 ? '10+' : widget.photoList![index].colors?[photoList![index].currentIndex!].stock}",
+          "Stok ${widget.photoList![index].colors?[photoList![index].currentIndex!].stock == -99 ? '10+' : widget.photoList![index].colors?[photoList![index].currentIndex!].stock}",
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
-              color: Colors.black54,
+              color: Colors.black87,
               fontSize: 12,
               fontWeight: FontWeight.w700));
     } else {

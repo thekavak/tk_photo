@@ -45,7 +45,7 @@ class _ShowAttributesModalState extends ConsumerState<ShowAttributesModal> {
                                       e.options?.forEach((element) {
                                         if (element.code == value) {
                                           element.isSelected = true;
-                                          print(element.name);
+                                          //print(element.name);
                                         } else {
                                           element.isSelected = false;
                                         }
